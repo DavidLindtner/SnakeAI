@@ -18,6 +18,9 @@ class Snake():
         self.moveX = 0
         self.moveY = 0
         self.score = 1
+        self.noOfMoves = 0
+        self.noWithoutFood = 0
+        self.foodMovesRatio = 1
 
         self.setBorder()
         self.generateEat()
@@ -75,10 +78,16 @@ class Snake():
             self.parts.insert(0, self.parts[0]-globalVars.fieldSize)
             self.parts.pop()
 
+        self.noWithoutFood += 1
+        self.noOfMoves += 1
+        self.foodMovesRatio = self.noOfMoves / self.score
 
     def eat(self):
         self.score += 1
+        self.noWithoutFood = 0
+
         self.parts.append(self.parts[-1])
+        self.field[self.parts[-1]] = 1
         self.generateEat()
 
     def generateEat(self):
