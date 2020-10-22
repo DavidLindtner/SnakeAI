@@ -133,10 +133,6 @@ class PlayScreen(GridLayout):
 
 
     def drawScreen(self, instance):
-        self.scoreLabel.text = str(self.snake.score)
-        self.movesLabel.text = str(self.snake.noOfMoves)
-        self.movesWithoutFoodLabel.text = str(self.snake.noWithoutFood)
-        self.foodMovesRatioLabel.text = str(round(self.snake.foodMovesRatio,1))
 
         if self.snake.snakeStep(Xdir = self.moveX, Ydir = self.moveY):
             self.drawField(field=self.snake.field)
@@ -149,6 +145,10 @@ class PlayScreen(GridLayout):
             self.playBar.text = "GAME OVER"
             self.playBar.font_size='20sp'
 
+        self.scoreLabel.text = str(self.snake.score)
+        self.movesLabel.text = str(self.snake.noOfMoves)
+        self.movesWithoutFoodLabel.text = str(self.snake.noWithoutFood)
+        self.foodMovesRatioLabel.text = str(round(self.snake.foodMovesRatio,1))
 
     def drawField(self, field, opacity=1):
         i = 0

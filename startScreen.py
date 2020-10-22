@@ -42,7 +42,7 @@ class StartScreen(GridLayout):
 
         btn1Line = GridLayout(cols=3, row_force_default=True, row_default_height=40)
 
-        self.play = Button(text="PLAY", size_hint_x=None, width=150)
+        self.play = Button(text="Play", size_hint_x=None, width=150)
         btn1Line.add_widget(Label(text=""))
         btn1Line.add_widget(self.play)
         btn1Line.add_widget(Label(text=""))
@@ -51,13 +51,17 @@ class StartScreen(GridLayout):
         self.add_widget(btn1Line)
 
 
-        btn2Line = GridLayout(cols=3, row_force_default=True, row_default_height=40)
+        btn2Line = GridLayout(cols=5, row_force_default=True, row_default_height=40)
 
-        self.play = Button(text="AI CONFIGURE", size_hint_x=None, width=150)
+        self.aiConf = Button(text="Setup AI", size_hint_x=None, width=150)
+        self.aiResult = Button(text="See results", size_hint_x=None, width=150)
         btn2Line.add_widget(Label(text=""))
-        btn2Line.add_widget(self.play)
+        btn2Line.add_widget(self.aiConf)
         btn2Line.add_widget(Label(text=""))
-        self.play.bind(on_press=self.aiButton)
+        btn2Line.add_widget(self.aiResult)
+        btn2Line.add_widget(Label(text=""))
+        self.aiConf.bind(on_press=self.aiConfButton)
+        self.aiResult.bind(on_press=self.aiResButton)
 
         self.add_widget(btn2Line)
 
@@ -68,7 +72,6 @@ class StartScreen(GridLayout):
         globalVars.fieldSize = int(self.fieldSizeTI.text) + 2
         globalVars.snakeSpeed = float(self.snakeSpeedTI.text)
 
-        #snakeApp.createPlayScreen()
         if globalVars.buttonPressed.playButton == 1:
             globalVars.buttonPressed.playButton = 0
         else:
@@ -76,14 +79,14 @@ class StartScreen(GridLayout):
 
         globalVars.screenManager.current = "Play"
 
-    def aiButton(self, instance):
-
+    def aiConfButton(self, instance):
         globalVars.fieldSize = int(self.fieldSizeTI.text) + 2
         globalVars.snakeSpeed = float(self.snakeSpeedTI.text)
 
-        if globalVars.buttonPressed.aiButton == 1:
-            globalVars.buttonPressed.aiButton = 0
-        else:
-            globalVars.buttonPressed.aiButton = 1
+        globalVars.screenManager.current = "AiConf"
 
-        globalVars.screenManager.current = "Ai"
+    def aiResButton(self, instance):
+        globalVars.fieldSize = int(self.fieldSizeTI.text) + 2
+        globalVars.snakeSpeed = float(self.snakeSpeedTI.text)
+
+        globalVars.screenManager.current = "AiRes"

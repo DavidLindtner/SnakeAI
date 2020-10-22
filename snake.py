@@ -13,10 +13,10 @@ from kivy.factory import Factory
 from kivy.lang import Builder
 
 import globalVars
-from snakeBody import Snake
-from aiScreen import AiScreen
 from startScreen import StartScreen
 from playScreen import PlayScreen
+from aiScreen import AiScreen
+from aiResultsScreen import AiResultScreen
 
 kivy.require("1.11.1")
 
@@ -30,13 +30,21 @@ class SnakeAI(App):
 
         globalVars.buttonPressed.bind(playButton=self.createPlayScreen)
         globalVars.buttonPressed.bind(goStartButton=self.destroyPlayScreen)
-        globalVars.buttonPressed.bind(aiButton=self.createAiScreen)
-        globalVars.buttonPressed.bind(goStartAi=self.destroyAiScreen)
 
         self.startScreen = StartScreen()
         self.screen = Screen(name="Start")
         self.screen.add_widget(self.startScreen)
         globalVars.screenManager.add_widget(self.screen)
+
+        self.aiScreen = AiScreen()
+        self.screenAi = Screen(name="AiConf")
+        self.screenAi.add_widget(self.aiScreen)
+        globalVars.screenManager.add_widget(self.screenAi)
+
+        self.aiScreenRes = AiResultScreen()
+        self.screenAiRes = Screen(name="AiRes")
+        self.screenAiRes.add_widget(self.aiScreenRes)
+        globalVars.screenManager.add_widget(self.screenAiRes)
 
         Window.size = (350, 600)
 
@@ -51,18 +59,6 @@ class SnakeAI(App):
     def destroyPlayScreen(self, instance, value):
         del self.playScreen
         globalVars.screenManager.remove_widget(self.screenPlay)
-
-
-    def createAiScreen(self, instance, value):
-        self.aiScreen = AiScreen()
-        self.screenAi = Screen(name="Ai")
-        self.screenAi.add_widget(self.aiScreen)
-        globalVars.screenManager.add_widget(self.screenAi)
-
-    def destroyAiScreen(self, instance, value):
-        del self.aiScreen
-        globalVars.screenManager.remove_widget(self.screenAi)
-
 
 if __name__ == '__main__':
 

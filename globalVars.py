@@ -5,8 +5,6 @@ from kivy.event import EventDispatcher
 class ButtonPressed(EventDispatcher):
     playButton = NumericProperty(1)
     goStartButton = NumericProperty(1)
-    aiButton = NumericProperty(1)
-    goStartAi = NumericProperty(1)
 
 def init():
     global screenManager
