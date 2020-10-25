@@ -9,12 +9,16 @@ class ButtonPressed(EventDispatcher):
 def init():
     global screenManager
     global fieldSize
+    global fieldSizeSimulate
     global snakeSpeed
     global buttonPressed
+    global snakeSpeekSimulate
 
     screenManager = ScreenManager()
     fieldSize = 12
     snakeSpeed = 4
+    fieldSizeSimulate = 12
+    snakeSpeekSimulate = 4
     buttonPressed = ButtonPressed()
 
 

@@ -11,8 +11,8 @@ from kivy.properties import ListProperty
 from kivy.factory import Factory
 from kivy.lang import Builder
 
-
-import globalVars
+from Globals import globalVars
+from Globals import globalFcns
 
 from snakeBody import Snake
 
@@ -46,7 +46,7 @@ class PlayScreen(GridLayout):
 
         self.cols = 1
 
-        self.field = GridLayout(cols=globalVars.fieldSize, rows=globalVars.fieldSize, row_force_default=False, row_default_height=Window.size[0]/globalVars.fieldSize, spacing=1)
+        self.field = GridLayout(cols=globalVars.fieldSize, rows=globalVars.fieldSize, row_force_default=False, row_default_height=Window.size[0]/globalVars.fieldSize-1, spacing=1)
 
         self.screenCell = []
 
@@ -55,6 +55,7 @@ class PlayScreen(GridLayout):
             self.field.add_widget(self.screenCell[i])
 
         self.add_widget(self.field)
+        
 
         self.add_widget(Label())
         self.add_widget(Label())
@@ -63,9 +64,6 @@ class PlayScreen(GridLayout):
 
         self.playBar = Label(text="3", color=(0,1,0,1), font_size='40sp')
         self.add_widget(self.playBar)
-
-        self.snake = Snake(controlled=True)
-        self.newGame()
 
         scoreLine = GridLayout(cols=7, rows=1, row_force_default=True, row_default_height=40)
 
@@ -112,6 +110,10 @@ class PlayScreen(GridLayout):
 
         self.add_widget(btnLine)
 
+        self.snake = Snake()
+
+        self.newGame()
+
     def _keyboard_closed(self):
         self._keyboard.unbind(on_key_down=self._on_keyboard_down)
         self._keyboard = None
@@ -133,44 +135,34 @@ class PlayScreen(GridLayout):
 
 
     def drawScreen(self, instance):
-
         if self.snake.snakeStep(Xdir = self.moveX, Ydir = self.moveY):
-            self.drawField(field=self.snake.field)
+            self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
         else:
-            self.drawField(field=self.snake.field)
-            self.event.cancel()
-            self.drawField(field=self.snake.field, opacity=0.5)
-            self.moveX = 0
-            self.moveY = 0
-            self.playBar.text = "GAME OVER"
-            self.playBar.font_size='20sp'
+            if self.snake.win:
+                self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
+                self.event.cancel()
+                self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field, opacity=0.5)
+                self.moveX = 0
+                self.moveY = 0
+                self.playBar.text = "YOU WIN"
+                self.playBar.font_size='20sp'
+            else:
+                self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
+                self.event.cancel()
+                self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field, opacity=0.5)
+                self.moveX = 0
+                self.moveY = 0
+                self.playBar.text = "GAME OVER"
+                self.playBar.font_size='20sp'
 
         self.scoreLabel.text = str(self.snake.score)
         self.movesLabel.text = str(self.snake.noOfMoves)
         self.movesWithoutFoodLabel.text = str(self.snake.noWithoutFood)
         self.foodMovesRatioLabel.text = str(round(self.snake.foodMovesRatio,1))
 
-    def drawField(self, field, opacity=1):
-        i = 0
-        for cell in self.screenCell:
-            if field[i] == 0:
-                cell.bcolor=(0,0,0,opacity)                
-            elif field[i] == 1:
-                cell.bcolor=(1,1,1,opacity)  
-            elif field[i] == 2:
-                cell.bcolor=(1,1,1,opacity)  
-            elif field[i] == 3:
-                cell.bcolor=(0,1,0,opacity)  
-            elif field[i] == 4:
-                cell.bcolor=(0.2,0.2,0.2,opacity)
-            elif field[i] == 5:
-                cell.bcolor=(1,0,0,opacity)
-            else:
-                cell.bcolor=(0,0,0,opacity)
-            i = i + 1
 
     def playAgainButton(self, instance):
-        self.drawField(field=self.snake.field, opacity=0.5)
+        self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field, opacity=0.5)
         try:
             self.event.cancel()
             self.event1.cancel()
@@ -209,12 +201,13 @@ class PlayScreen(GridLayout):
         self.playBar.text = "1"
         self.playBar.font_size='40sp'
         self.event3 = Clock.schedule_once(self.newGameCount3, 1)
-
-    def newGameCount3(self, instance):
         del self.snake
         self.moveX = 1
         self.moveY = 0
-        self.snake = Snake(controlled=True)
+        self.snake = Snake(intelligence=False)
+        self.drawScreen(0)
+
+    def newGameCount3(self, instance):
         self.event = Clock.schedule_interval(self.drawScreen, 1/globalVars.snakeSpeed)
         self.playBar.text = "PLAY"
         self.playBar.font_size='20sp'

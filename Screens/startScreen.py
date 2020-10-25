@@ -8,7 +8,7 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
 from kivy.core.window import Window
 
-import globalVars
+from Globals import globalVars
 
 
 

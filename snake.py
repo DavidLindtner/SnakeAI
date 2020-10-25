@@ -1,22 +1,14 @@
 import kivy
 from kivy.app import App
-from kivy.uix.gridlayout import GridLayout
-from kivy.uix.label import Label
-from kivy.uix.button import Button
-from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.clock import Clock
 from kivy.core.window import Window
-from kivy.graphics import Color, Rectangle
-from kivy.properties import ListProperty
-from kivy.factory import Factory
-from kivy.lang import Builder
 
-import globalVars
-from startScreen import StartScreen
-from playScreen import PlayScreen
-from aiScreen import AiScreen
-from aiResultsScreen import AiResultScreen
+from Globals import globalVars
+
+from Screens.startScreen import StartScreen
+from Screens.playScreen import PlayScreen
+from Screens.aiScreen import AiScreen
+from Screens.aiResultsScreen import AiResultScreen
 
 kivy.require("1.11.1")
 
@@ -50,6 +42,7 @@ class SnakeAI(App):
 
         return globalVars.screenManager
 
+
     def createPlayScreen(self, instance, value):
         self.playScreen = PlayScreen()
         self.screenPlay = Screen(name="Play")
@@ -64,8 +57,3 @@ if __name__ == '__main__':
 
     snakeApp = SnakeAI()
     snakeApp.run()
-
-    
-    
-
-

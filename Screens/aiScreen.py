@@ -9,7 +9,8 @@ from kivy.clock import Clock
 
 import threading
 
-import globalVars
+from Globals import globalVars
+
 from snakeBody import Snake
 
 class AiScreen(GridLayout):
@@ -73,15 +74,23 @@ class AiScreen(GridLayout):
 
         self.generate = True
 
-        for i in range(self.noOfSnakes):
-            self.snakes.append(Snake(controlled=False,fieldSize=20))
-
         counter = 0
+
         while self.generate:
+            #   Create 1 generation of snakes
+            for i in range(self.noOfSnakes):
+                self.snakes.append(Snake(intelligence=False))
+
             for snake in self.snakes:
-                while snake.snakeStep(Xdir = 1, Ydir = 0) and snake.noWithoutFood < globalVars.fieldSize * globalVars.fieldSize:
-                    pass
+                while  snake.noWithoutFood < globalVars.fieldSize * globalVars.fieldSize:
+                    if not snake.snakeStep(Xdir = 1, Ydir = 0):
+                        break
+
+            for snake in self.snakes:
                 del snake
+
+            self.snakes = []
+
             self.selfactualSnaleLabel.text = str(counter)
             counter += 1
 
