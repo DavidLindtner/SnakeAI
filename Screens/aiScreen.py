@@ -8,10 +8,14 @@ from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
 
 import threading
+import csv
+from datetime import datetime
 
 from Globals import globalVars
 
 from snakeBody import Snake
+
+from Intelligence.generation import Generation
 
 class AiScreen(GridLayout):
     def __init__(self, **kwargs):
@@ -20,6 +24,8 @@ class AiScreen(GridLayout):
         self.noOfSnakes = 200
         self.noOfGenerations = 0
         self.snakes = []
+        self.bestSnakes = []
+        self.fitness = []
  
         self.cols = 1
 
@@ -32,12 +38,37 @@ class AiScreen(GridLayout):
 
         self.add_widget(numSnakeLine)
 
+        num1SnakeLine = GridLayout(cols=2, row_force_default=True, row_default_height=30)
+        num1SnakeLine.add_widget(Label(text='Selection rate', size_hint_x=None, width=200))
+        self.selectionRateTI = TextInput(multiline=False, text=str(0.1), size_hint_x=None, width=50)
+        num1SnakeLine.add_widget(self.selectionRateTI)
+
+        self.add_widget(num1SnakeLine)
+
+        num2SnakeLine = GridLayout(cols=2, row_force_default=True, row_default_height=30)
+        num2SnakeLine.add_widget(Label(text='Mutation rate', size_hint_x=None, width=200))
+        self.mutationRateTI = TextInput(multiline=False, text=str(0.01), size_hint_x=None, width=50)
+        num2SnakeLine.add_widget(self.mutationRateTI)
+
+        self.add_widget(num2SnakeLine)
+
         actualSnakeLine = GridLayout(cols=2, row_force_default=True, row_default_height=30)
         actualSnakeLine.add_widget(Label(text='Actual generation', size_hint_x=None, width=200))
-        self.selfactualSnaleLabel = Label(text="0", size_hint_x=None, width=50)
-        actualSnakeLine.add_widget(self.selfactualSnaleLabel)
+        self.actualSnaleLabel = Label(text="0", size_hint_x=None, width=50)
+        actualSnakeLine.add_widget(self.actualSnaleLabel)
 
         self.add_widget(actualSnakeLine)
+
+        scoreSnakeLine = GridLayout(cols=5, row_force_default=True, row_default_height=30)
+        scoreSnakeLine.add_widget(Label(text='Best score:', size_hint_x=None, width=100))
+        self.scorelSnaleLabel = Label(text="0", size_hint_x=None, width=60)
+        scoreSnakeLine.add_widget(self.scorelSnaleLabel)
+        scoreSnakeLine.add_widget(Label(text=''))
+        scoreSnakeLine.add_widget(Label(text='Best fitness:', size_hint_x=None, width=100))
+        self.fitnesslSnaleLabel = Label(text="0", size_hint_x=None, width=60)
+        scoreSnakeLine.add_widget(self.fitnesslSnaleLabel)
+
+        self.add_widget(scoreSnakeLine)
 
         btn2Line = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=40)
         generateSnakesButton = Button(text="Generate Snakes", size_hint_x=None, width=150)
@@ -66,33 +97,70 @@ class AiScreen(GridLayout):
         globalVars.screenManager.current = "Start"
 
     def generateSnakesButton(self, instance):
-        generateThreadHandle = threading.Thread(target=self.generateThread, daemon=True)
-        generateThreadHandle.start()
+        self.generateThreadHandle = threading.Thread(target=self.generateThread, daemon=True)
+        self.generateThreadHandle.start()
 
     def generateThread(self):
         self.noOfSnakes = int(self.noOfSnakesTI.text)
 
         self.generate = True
 
-        counter = 0
+        bestSnakes = []
+        self.bestScore = []
+        self.bestFitness = []
 
+        counterGen = 0
         while self.generate:
-            #   Create 1 generation of snakes
-            for i in range(self.noOfSnakes):
-                self.snakes.append(Snake(intelligence=False))
+            if counterGen == 0:
+                generation = Generation(noOfSnakes=self.noOfSnakes, selectionRate=float(self.selectionRateTI.text))
+                generation.live()
+                bestSnakes = generation.exportBest()
+                score, fitness = generation.bestScoreFitness()
 
-            for snake in self.snakes:
-                while  snake.noWithoutFood < globalVars.fieldSize * globalVars.fieldSize:
-                    if not snake.snakeStep(Xdir = 1, Ydir = 0):
-                        break
+                noOfInputs, noOfNeuron1Layer, noOfNeuron2Layer = bestSnakes[0].exportDimBrain()
+                self.createDataCsv(noOfInputs=noOfInputs, noOfNeuron1Layer=noOfNeuron1Layer, noOfNeuron2Layer=noOfNeuron2Layer)
+                del generation
+            else:
+                generation = Generation(noOfSnakes=self.noOfSnakes, mutationRate=float(self.mutationRateTI.text), selectionRate=float(self.selectionRateTI.text))
+                generation.live(parents=bestSnakes)
+                bestSnakes = generation.exportBest()
+                score, fitness = generation.bestScoreFitness()
+                self.saveWeightsCsv(generation.bestWeights())
+                del generation
 
-            for snake in self.snakes:
-                del snake
+            self.bestScore.append(score)
+            self.bestFitness.append(fitness)
 
-            self.snakes = []
-
-            self.selfactualSnaleLabel.text = str(counter)
-            counter += 1
+            self.actualSnaleLabel.text = str(counterGen)
+            self.scorelSnaleLabel.text = str(score)
+            self.fitnesslSnaleLabel.text = str(fitness)
+            counterGen += 1
 
     def stopSnakeButton(self, instance):
         self.generate = False
+        self.generateThreadHandle.join()
+        self.saveBestScoreCsv()
+
+
+    def createDataCsv(self, noOfInputs, noOfNeuron1Layer, noOfNeuron2Layer):
+        now = datetime.now()
+        self.fileName = now.strftime("Population-%d-%m-%Y--%H-%M-%S.csv")
+        with open(self.fileName, 'w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["noOfSnakes", self.noOfSnakesTI.text])
+            writer.writerow(["selectionRate", self.selectionRateTI.text])
+            writer.writerow(["mutationRate", self.mutationRateTI.text])
+            writer.writerow(["noOfInputs", noOfInputs])
+            writer.writerow(["noOfNeuron1Layer", noOfNeuron1Layer])
+            writer.writerow(["noOfNeuron2Layer", noOfNeuron2Layer])
+
+    def saveWeightsCsv(self, weights):
+        with open(self.fileName, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["weights", weights])
+
+    def saveBestScoreCsv(self):
+        with open(self.fileName, 'a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["bestScores", self.bestScore])
+            writer.writerow(["bestFitness", self.bestFitness])

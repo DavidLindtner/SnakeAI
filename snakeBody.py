@@ -2,7 +2,7 @@ from random import randint
 from kivy.core.window import Window
 
 from Globals import globalVars
-from brain import Brain
+from Intelligence.brain import Brain
 
 #   COLORS
 #   Background  0   black
@@ -26,6 +26,7 @@ class Snake():
             self.parts = [int(self.fieldSize*self.fieldSize/2 - self.fieldSize/2 - 1)]
         else:
             self.parts = [int(self.fieldSize*self.fieldSize/2 - 1)]
+
         self.last = 0
         self.moveX = 0
         self.moveY = 0
@@ -33,10 +34,12 @@ class Snake():
         self.noOfMoves = 0
         self.noWithoutFood = 0
         self.foodMovesRatio = 1
+        self.fitness = 0
         self.win = False
 
 #   E, NE, N, NW, W, SW, S, SE
         self.distWall = [0] * 8
+        self.seeWall = [0] * 8
         self.seeFood = [0] * 8
         self.seeSnake = [0] * 8
         self.distSnake = [0] * 8
@@ -47,12 +50,19 @@ class Snake():
         self.setBorder()
         self.generateEat()
 
+
     def randomBrain(self):
         self.brain = Brain()
 
-    def importBrain(self, w1, w2, w3):
-        self.brain = Brain(weight1=w1, weight2=w2, weight3=w3)
-    
+    def importBrain(self, rates):
+        self.brain = Brain()
+        self.brain.importWeight(rates)
+
+    def exportBrain(self):
+        return self.brain.exportWeight()
+
+    def exportDimBrain(self):
+        return [self.brain.noOfInputs, self.brain.noOfNeuron1Layer, self.brain.noOfNeuron2Layer]
 
     def setBorder(self):
         self.field[0:self.fieldSize] = [4] * self.fieldSize
@@ -70,23 +80,31 @@ class Snake():
         self.last = self.parts[-1]
 
         if self.win:
+            self.calculateFitness()
             return False
 
+        
         self.snakeMove()
+        self.calculateFitness()
+        #self.countVision()
 
         #   hit snake
         if self.field[self.parts[0]] == 1:
+            self.calculateFitness()
             self.field[self.parts[1]] = 1
             self.field[self.parts[0]] = 5
-            self.stopMove()
+            self.moveX = 0
+            self.moveY = 0
             return False
 
         #   hit border
         if self.field[self.parts[0]] == 4:
+            self.calculateFitness()
             self.field[self.parts[0]] = 5
             if len(self.parts) >= 2:
                 self.field[self.parts[1]] = 1
-            self.stopMove()
+            self.moveX = 0
+            self.moveY = 0
             return False
 
         #   hit food
@@ -101,7 +119,6 @@ class Snake():
 
 
     def snakeMove(self):
-
         if self.intelligence:
             self.countVision()
             self.brain.think(input=self.see)
@@ -116,7 +133,7 @@ class Snake():
                 self.moveY = 0
             elif self.brain.outputList[3] == 1:
                 self.moveX = 0
-                self.moveY = 1
+                self.moveY = -1
 
         if self.moveX == 1 and self.moveY == 0:
             self.parts.insert(0, self.parts[0]+1)
@@ -163,11 +180,10 @@ class Snake():
             self.field[foodPos] = 3
         else:
             self.win = True
-        
 
-    def stopMove(self):
-        self.moveX = 0
-        self.moveY = 0
+
+    def calculateFitness(self):
+        self.fitness = self.score*self.score*self.score*self.score + self.noOfMoves
 
     def countVision(self):
         #   BORDER
@@ -206,6 +222,12 @@ class Snake():
             position = self.parts[0]
             counter = 0
 
+        self.seeWall = [0] * 8
+        for i in range(8):
+            if self.distWall[i] == 0:
+                self.seeWall[i] = 10
+
+
         self.distFood = [0] * 8
         #   SEE FOOD
         for i in range(8):
@@ -242,7 +264,7 @@ class Snake():
             
         for i in range(8):
             if self.distFood[i] != self.distWall[i]:
-                self.seeFood[i] = 1
+                self.seeFood[i] = 10
             else:
                 self.seeFood[i] = 0
                 self.distFood[i] = self.fieldSize
@@ -283,7 +305,7 @@ class Snake():
             
         for i in range(8):
             if self.distSnake[i] != self.distWall[i]:
-                self.seeSnake[i] = 1
+                self.seeSnake[i] = 10
             else:
                 self.seeSnake[i] = 0
 
@@ -298,10 +320,11 @@ class Snake():
         elif self.moveX == 0 and self.moveY == -1:
             self.lastMove[3] = 1
 
-        self.see = self.distWall + self.seeSnake + self.seeFood + self.lastMove
+        self.see = self.seeWall + self.seeSnake + self.seeFood #+ self.lastMove
 
         #print(" ")
         #print("distWall : " + str(self.distWall))
+        #print("seeWall  : " + str(self.seeWall))
         #print("seeFood  : " + str(self.seeFood))
         #print("seeSnake : " + str(self.seeSnake))
         #print("distSnake: " + str(self.distSnake))

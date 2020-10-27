@@ -136,8 +136,12 @@ class PlayScreen(GridLayout):
 
     def drawScreen(self, instance):
         if self.snake.snakeStep(Xdir = self.moveX, Ydir = self.moveY):
+            #print("fitness")
+            #print(self.snake.fitness)
             self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
         else:
+            #print("fitness")
+            #print(self.snake.fitness)
             if self.snake.win:
                 self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
                 self.event.cancel()

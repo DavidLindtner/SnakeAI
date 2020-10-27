@@ -7,8 +7,8 @@ from kivy.core.window import Window
 from kivy.graphics import Color, Rectangle
 from kivy.properties import ListProperty
 from kivy.lang import Builder
+import csv
 import sys
-
 
 from Globals import globalFcns
 
@@ -40,6 +40,10 @@ class SimulateScreen(GridLayout):
 
         self.fieldSize = int(sys.argv[1])+2
         self.snakeSpeed = float(sys.argv[2])
+        self.fileName = sys.argv[3]
+        self.indexWeight = int(sys.argv[4])
+
+        self.readWeightCsv(self.fileName)
 
         self.cols = 1
 
@@ -56,11 +60,13 @@ class SimulateScreen(GridLayout):
         self.event = Clock.schedule_interval(self.drawScreen, 1/self.snakeSpeed)
 
         self.snake = Snake(intelligence=True,fieldSize=self.fieldSize-2)
-        self.snake.randomBrain()
+        self.snake.importBrain(self.weights[self.indexWeight])
 
 
     def drawScreen(self, instance):
         if self.snake.snakeStep():
+            #print("fitness")
+            #print(self.snake.fitness)
             self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
         else:
             if self.snake.win:
@@ -72,6 +78,14 @@ class SimulateScreen(GridLayout):
                 self.event.cancel()
                 self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field, opacity=0.5)
 
+
+    def readWeightCsv(self, fileName):
+        with open(fileName) as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            self.weights = []
+            for row in csv_reader:
+                if row[0] == 'weights':
+                    self.weights.append(list(map(float, row[1][1:-1].split(','))))
 
 
 class SimulateSnake(App):
