@@ -140,13 +140,17 @@ class Crossover():
         return self.outSnakes
 
 
-    def mutation(self, mutRates):
-        
-        for i in range(int(len(mutRates) * self.mutationRate)):
-            x = np.random.randint(len(mutRates))
-            mutRates[x] += (2 * np.random.random() - 1) * 0.5
+    def mutation(self, Rates):
+        mutationStrength = 1
+        for i in range(int(len(Rates) * self.mutationRate)):
+            x = np.random.randint(len(Rates))
+            Rates[x] += (2 * np.random.random() - 1) * mutationStrength
 
-        return mutRates
+        for i in range(int(len(Rates) * self.mutationRate / 5)):
+            x = np.random.randint(len(Rates))
+            Rates[x] += (2 * np.random.random() - 1) * mutationStrength * 5
+
+        return Rates
 
 
 

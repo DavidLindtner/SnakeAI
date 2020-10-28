@@ -9,7 +9,12 @@ from kivy.clock import Clock
 
 import threading
 import csv
+import sys
+import time
+import os
 from datetime import datetime
+import tkinter as tk
+from tkinter import filedialog
 
 from Globals import globalVars
 
@@ -27,6 +32,8 @@ class AiScreen(GridLayout):
         self.bestSnakes = []
         self.fitness = []
  
+        self.graphName = 'data'
+
         self.cols = 1
 
         self.add_widget(Label(text='SNAKE AI'))
@@ -82,6 +89,14 @@ class AiScreen(GridLayout):
         btn2Line.add_widget(Label())
         self.add_widget(btn2Line)
 
+        graphsLine = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40)
+        graphsBut = Button(text="Show graphs", size_hint_x=None, width=100)
+        graphsBut.bind(on_press=self.openGraphs)
+        graphsLine.add_widget(Label())
+        graphsLine.add_widget(graphsBut)
+        graphsLine.add_widget(Label())
+        self.add_widget(graphsLine)
+
 
         btn1Line = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40)
         goStartBut = Button(text="Go back", size_hint_x=None, width=100)
@@ -92,13 +107,24 @@ class AiScreen(GridLayout):
         self.add_widget(btn1Line)
 
 
+    def openGraphs(self, instance):
+        from subprocess import Popen
+        Popen(['python', 'graphs.py', str(self.graphName), '1'])
+
+
+    def writeDataGraphs(self, score, gen, fit, sec):
+        with open(self.graphName, 'a') as f:
+            f.write(str(score) + ',' + str(gen) + ',' + str(fit) + ',' + str(sec) + ",\n")
 
     def goStartButton(self, instance):
         globalVars.screenManager.current = "Start"
 
+
     def generateSnakesButton(self, instance):
-        self.generateThreadHandle = threading.Thread(target=self.generateThread, daemon=True)
-        self.generateThreadHandle.start()
+        if self.createDataCsv():
+            self.generateThreadHandle = threading.Thread(target=self.generateThread, daemon=True)
+            self.generateThreadHandle.start()
+
 
     def generateThread(self):
         self.noOfSnakes = int(self.noOfSnakesTI.text)
@@ -110,15 +136,20 @@ class AiScreen(GridLayout):
         self.bestFitness = []
 
         counterGen = 0
+        startTime = time.time()
+
         while self.generate:
             if counterGen == 0:
                 generation = Generation(noOfSnakes=self.noOfSnakes, selectionRate=float(self.selectionRateTI.text))
                 generation.live()
                 bestSnakes = generation.exportBest()
                 score, fitness = generation.bestScoreFitness()
-
                 noOfInputs, noOfNeuron1Layer, noOfNeuron2Layer = bestSnakes[0].exportDimBrain()
-                self.createDataCsv(noOfInputs=noOfInputs, noOfNeuron1Layer=noOfNeuron1Layer, noOfNeuron2Layer=noOfNeuron2Layer)
+                self.saveDataCsv(noOfInputs=noOfInputs, noOfNeuron1Layer=noOfNeuron1Layer, noOfNeuron2Layer=noOfNeuron2Layer)
+                self.saveWeightsCsv(generation.bestWeights())
+                actualTime = time.time() - startTime
+                self.writeDataGraphs(score, counterGen, fitness, actualTime)
+                self.openGraphs(0)
                 del generation
             else:
                 generation = Generation(noOfSnakes=self.noOfSnakes, mutationRate=float(self.mutationRateTI.text), selectionRate=float(self.selectionRateTI.text))
@@ -126,6 +157,8 @@ class AiScreen(GridLayout):
                 bestSnakes = generation.exportBest()
                 score, fitness = generation.bestScoreFitness()
                 self.saveWeightsCsv(generation.bestWeights())
+                actualTime = time.time() - startTime
+                self.writeDataGraphs(score, counterGen, fitness, actualTime)
                 del generation
 
             self.bestScore.append(score)
@@ -140,13 +173,24 @@ class AiScreen(GridLayout):
         self.generate = False
         self.generateThreadHandle.join()
         self.saveBestScoreCsv()
+        if os.path.exists(self.graphName):
+            os.remove(self.graphName)
 
-
-    def createDataCsv(self, noOfInputs, noOfNeuron1Layer, noOfNeuron2Layer):
+    def createDataCsv(self):
         now = datetime.now()
-        self.fileName = now.strftime("Population-%d-%m-%Y--%H-%M-%S.csv")
+        self.fileDateTime = now.strftime("%d.%m.%Y-%H:%M:%S")
+        initFileName = now.strftime("Population-%d-%m-%Y--%H-%M-%S")
+        print(initFileName)
+        self.fileName = filedialog.asksaveasfilename(initialdir="/", initialfile=initFileName, title="Export population", filetypes=(("CSV", "*.csv"), ("All files", "*.*")), defaultextension='.csv')
+        if self.fileName:
+            return True
+        else:
+            return False
+
+    def saveDataCsv(self, noOfInputs, noOfNeuron1Layer, noOfNeuron2Layer):
         with open(self.fileName, 'w', newline='') as file:
             writer = csv.writer(file)
+            writer.writerow(["dateTime", self.fileDateTime])
             writer.writerow(["noOfSnakes", self.noOfSnakesTI.text])
             writer.writerow(["selectionRate", self.selectionRateTI.text])
             writer.writerow(["mutationRate", self.mutationRateTI.text])
@@ -160,7 +204,30 @@ class AiScreen(GridLayout):
             writer.writerow(["weights", weights])
 
     def saveBestScoreCsv(self):
+        with open(self.graphName, "r") as file:
+            self.score = []
+            self.generation = []
+            self.fitness = []
+            self.seconds = []
+            for line in file:
+                data = list(line.split(","))
+                score = int(data[0])
+                generation = int(data[1])
+                fitness = int(data[2])
+                seconds = float(data[3])
+
+                self.score.append(score)
+                self.generation.append(generation)
+                self.fitness.append(fitness)
+                self.seconds.append(seconds)
+
         with open(self.fileName, 'a', newline='') as file:
             writer = csv.writer(file)
-            writer.writerow(["bestScores", self.bestScore])
-            writer.writerow(["bestFitness", self.bestFitness])
+            writer.writerow(["score", self.score])
+            writer.writerow(["generation", self.generation])
+            writer.writerow(["fitness", self.fitness])
+            writer.writerow(["seconds", self.seconds])
+
+    def __del__(self):
+        if os.path.exists(self.graphName):
+            os.remove(self.graphName)

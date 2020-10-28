@@ -3,12 +3,15 @@ from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.core.window import Window
 
+import tkinter as tk
+
 from Globals import globalVars
 
 from Screens.startScreen import StartScreen
 from Screens.playScreen import PlayScreen
 from Screens.aiScreen import AiScreen
 from Screens.aiResultsScreen import AiResultScreen
+
 
 kivy.require("1.11.1")
 
@@ -18,7 +21,10 @@ globalVars.init()
 class SnakeAI(App):
 
     def build(self):
-        self.icon = 'snake.png'
+        self.icon = 'Icons/snake.png'
+        
+        self.root = tk.Tk()
+        self.root.withdraw()
 
         globalVars.buttonPressed.bind(playButton=self.createPlayScreen)
         globalVars.buttonPressed.bind(goStartButton=self.destroyPlayScreen)
@@ -38,7 +44,7 @@ class SnakeAI(App):
         self.screenAiRes.add_widget(self.aiScreenRes)
         globalVars.screenManager.add_widget(self.screenAiRes)
 
-        Window.size = (350, 600)
+        Window.size = (400, 650)
 
         return globalVars.screenManager
 

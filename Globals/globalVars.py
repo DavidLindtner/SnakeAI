@@ -13,6 +13,7 @@ def init():
     global snakeSpeed
     global buttonPressed
     global snakeSpeekSimulate
+    global icon
 
     screenManager = ScreenManager()
     fieldSize = 12
@@ -20,6 +21,7 @@ def init():
     fieldSizeSimulate = 12
     snakeSpeekSimulate = 4
     buttonPressed = ButtonPressed()
+    icon = 'snake.png'
 
 
 

@@ -22,10 +22,11 @@ class Snake():
             self.fieldSize = fieldSize + 2
 
         self.field = [0] * self.fieldSize * self.fieldSize
-        if self.fieldSize % 2 == 0:
-            self.parts = [int(self.fieldSize*self.fieldSize/2 - self.fieldSize/2 - 1)]
-        else:
-            self.parts = [int(self.fieldSize*self.fieldSize/2 - 1)]
+
+        #if self.fieldSize % 2 == 0:
+        #    self.parts = [int(self.fieldSize*self.fieldSize/2 - self.fieldSize/2 - 1)]
+        #else:
+        #    self.parts = [int(self.fieldSize*self.fieldSize/2 - 1)]
 
         self.last = 0
         self.moveX = 0
@@ -49,6 +50,7 @@ class Snake():
 
         self.setBorder()
         self.generateEat()
+        self.parts = [self.findRandAvailablePlace()]
 
 
     def randomBrain(self):
@@ -152,9 +154,10 @@ class Snake():
             self.field[self.parts[-1]] = 0
             self.parts.pop()
 
-        self.noWithoutFood += 1
-        self.noOfMoves += 1
-        self.foodMovesRatio = self.noOfMoves / self.score
+        if self.moveX != 0 or self.moveY != 0:
+            self.noWithoutFood += 1
+            self.noOfMoves += 1
+            self.foodMovesRatio = self.noOfMoves / self.score
 
     def eat(self):
         self.score += 1
@@ -166,9 +169,14 @@ class Snake():
         self.generateEat()
 
     def generateEat(self):
-        foodPos = 0
-        counter = 0
+        randPos = self.findRandAvailablePlace()
+        if randPos == 0:
+            self.win = True
+        else:
+            self.field[randPos] = 3
 
+    def findRandAvailablePlace(self):
+        counter = 0
         availablePlaces = []
         for cell in self.field:
             if cell == 0:
@@ -176,10 +184,11 @@ class Snake():
             counter += 1
 
         if availablePlaces:
-            foodPos = availablePlaces[randint(0, len(availablePlaces)-1)]
-            self.field[foodPos] = 3
+            randPos = availablePlaces[randint(0, len(availablePlaces)-1)]
         else:
-            self.win = True
+            randPos = 0
+
+        return randPos
 
 
     def calculateFitness(self):
@@ -226,6 +235,10 @@ class Snake():
         for i in range(8):
             if self.distWall[i] == 0:
                 self.seeWall[i] = 10
+                
+        self.reverseDistWall = [0] * 8
+        for i in range(8):
+            self.reverseDistWall[i] = self.fieldSize - self.distWall[i]
 
 
         self.distFood = [0] * 8

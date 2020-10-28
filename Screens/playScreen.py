@@ -61,6 +61,7 @@ class PlayScreen(GridLayout):
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
+        self.add_widget(Label())
 
         self.playBar = Label(text="3", color=(0,1,0,1), font_size='40sp')
         self.add_widget(self.playBar)
@@ -206,7 +207,7 @@ class PlayScreen(GridLayout):
         self.playBar.font_size='40sp'
         self.event3 = Clock.schedule_once(self.newGameCount3, 1)
         del self.snake
-        self.moveX = 1
+        self.moveX = 0
         self.moveY = 0
         self.snake = Snake(intelligence=False)
         self.drawScreen(0)

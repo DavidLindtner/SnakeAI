@@ -11,6 +11,7 @@ import csv
 import sys
 
 from Globals import globalFcns
+from Globals import globalVars
 
 from snakeBody import Snake
 
@@ -65,8 +66,6 @@ class SimulateScreen(GridLayout):
 
     def drawScreen(self, instance):
         if self.snake.snakeStep():
-            #print("fitness")
-            #print(self.snake.fitness)
             self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
         else:
             if self.snake.win:
@@ -90,6 +89,7 @@ class SimulateScreen(GridLayout):
 
 class SimulateSnake(App):
     def build(self):
+        self.icon = 'Icons/snake.png'
         return SimulateScreen()
 
 

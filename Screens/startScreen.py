@@ -11,7 +11,6 @@ from kivy.core.window import Window
 from Globals import globalVars
 
 
-
 class StartScreen(GridLayout):
 
     def __init__(self, **kwargs):
