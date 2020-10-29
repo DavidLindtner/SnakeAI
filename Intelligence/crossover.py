@@ -3,7 +3,9 @@ from snakeBody import Snake
 from Globals import globalFcns
 
 class Crossover():
-    def __init__(self, inSnakes, noOfOutSnakes, mutationRate):
+    def __init__(self, inSnakes, noOfOutSnakes, mutationRate, noNeuron1Layer, noNeuron2Layer):
+        self.noOfNeuron1Layer = noNeuron1Layer
+        self.noOfNeuron2Layer = noNeuron2Layer
         self.mutationRate = mutationRate
         self.inSnakes = inSnakes
         self.noOutSnakes = noOfOutSnakes
@@ -23,11 +25,11 @@ class Crossover():
                 ratesOld = self.inSnakes[i].exportBrain()
                 ratesNew = self.mutation(ratesOld)
                 self.outSnakes.append(Snake(intelligence=True))
-                self.outSnakes[-1].importBrain(ratesNew)
+                self.outSnakes[-1].importBrain(ratesNew, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
             
             ratesOld = self.inSnakes[i].exportBrain()
             self.outSnakes.append(Snake(intelligence=True))
-            self.outSnakes[-1].importBrain(ratesOld)
+            self.outSnakes[-1].importBrain(ratesOld, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
         return self.outSnakes
 
@@ -76,12 +78,12 @@ class Crossover():
                 ratesOld = ratesOffspringList[i].copy()
                 ratesNew = self.mutation(ratesOld)
                 self.outSnakes.append(Snake(intelligence=True))
-                self.outSnakes[-1].importBrain(ratesNew)
+                self.outSnakes[-1].importBrain(ratesNew, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
         for i in range(len(self.inSnakes)):
             ratesOld = self.inSnakes[i].exportBrain()
             self.outSnakes.append(Snake(intelligence=True))
-            self.outSnakes[-1].importBrain(ratesOld)
+            self.outSnakes[-1].importBrain(ratesOld, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
         return self.outSnakes
 
@@ -130,18 +132,18 @@ class Crossover():
                 ratesOld = ratesOffspringList[i].copy()
                 ratesNew = self.mutation(ratesOld)
                 self.outSnakes.append(Snake(intelligence=True))
-                self.outSnakes[-1].importBrain(ratesNew)
+                self.outSnakes[-1].importBrain(ratesNew, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
         for i in range(len(self.inSnakes)):
             ratesOld = self.inSnakes[i].exportBrain()
             self.outSnakes.append(Snake(intelligence=True))
-            self.outSnakes[-1].importBrain(ratesOld)
+            self.outSnakes[-1].importBrain(ratesOld, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
         return self.outSnakes
 
 
     def mutation(self, Rates):
-        mutationStrength = 1
+        mutationStrength = 0.5
         for i in range(int(len(Rates) * self.mutationRate)):
             x = np.random.randint(len(Rates))
             Rates[x] += (2 * np.random.random() - 1) * mutationStrength

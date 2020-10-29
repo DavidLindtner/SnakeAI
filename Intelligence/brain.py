@@ -9,10 +9,10 @@ from Globals import globalFcns
 #   3   up
 
 class Brain():
-    def __init__(self):
+    def __init__(self, noOfNeuron1=18, noOfNeuron2=12):
         self.noOfInputs = 24
-        self.noOfNeuron1Layer = 18
-        self.noOfNeuron2Layer = 12
+        self.noOfNeuron1Layer = noOfNeuron1
+        self.noOfNeuron2Layer = noOfNeuron2
         self.noOfOutputs = 4
 
         self.inputs = np.ones((self.noOfInputs, 1))

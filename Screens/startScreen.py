@@ -4,15 +4,14 @@ from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
-from kivy.uix.screenmanager import ScreenManager, Screen
+from kivy.uix.screenmanager import ScreenManager, SlideTransition
 from kivy.clock import Clock
 from kivy.core.window import Window
 
 from Globals import globalVars
 
-
+    
 class StartScreen(GridLayout):
-
     def __init__(self, **kwargs):
         super(StartScreen, self).__init__(**kwargs)
 
@@ -26,7 +25,6 @@ class StartScreen(GridLayout):
         dimLine.add_widget(self.fieldSizeTI)
 
         self.add_widget(dimLine)
-
 
         spdLine = GridLayout(cols=3, row_force_default=True, row_default_height=30)
 
@@ -65,7 +63,6 @@ class StartScreen(GridLayout):
         self.add_widget(btn2Line)
 
 
-
     def playButton(self, instance):
 
         globalVars.fieldSize = int(self.fieldSizeTI.text) + 2
@@ -76,16 +73,19 @@ class StartScreen(GridLayout):
         else:
             globalVars.buttonPressed.playButton = 1
 
+        globalVars.ScreenManager.transition = SlideTransition(direction='left')
         globalVars.screenManager.current = "Play"
 
     def aiConfButton(self, instance):
         globalVars.fieldSize = int(self.fieldSizeTI.text) + 2
         globalVars.snakeSpeed = float(self.snakeSpeedTI.text)
 
+        globalVars.ScreenManager.transition = SlideTransition(direction='left')
         globalVars.screenManager.current = "AiConf"
 
     def aiResButton(self, instance):
         globalVars.fieldSize = int(self.fieldSizeTI.text) + 2
         globalVars.snakeSpeed = float(self.snakeSpeedTI.text)
 
+        globalVars.ScreenManager.transition = SlideTransition(direction='left')
         globalVars.screenManager.current = "AiRes"

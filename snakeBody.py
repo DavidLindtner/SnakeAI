@@ -53,11 +53,11 @@ class Snake():
         self.parts = [self.findRandAvailablePlace()]
 
 
-    def randomBrain(self):
-        self.brain = Brain()
+    def randomBrain(self, noOfNeuron1, noOfNeuron2):
+        self.brain = Brain(noOfNeuron1=noOfNeuron1, noOfNeuron2=noOfNeuron2)
 
-    def importBrain(self, rates):
-        self.brain = Brain()
+    def importBrain(self, rates, noOfNeuron1, noOfNeuron2):
+        self.brain = Brain(noOfNeuron1=noOfNeuron1, noOfNeuron2=noOfNeuron2)
         self.brain.importWeight(rates)
 
     def exportBrain(self):

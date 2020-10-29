@@ -8,6 +8,11 @@ from kivy.uix.textinput import TextInput
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.clock import Clock
 from kivy.uix.slider import Slider
+from kivy.uix.behaviors import ButtonBehavior  
+from kivy.uix.image import Image  
+from kivy.lang import Builder 
+from kivy.uix.popup import Popup
+from kivy.uix.screenmanager import SlideTransition
 
 import threading
 import tkinter as tk
@@ -17,7 +22,16 @@ import csv
 from Globals import globalVars
 
 
+class ImageButton(ButtonBehavior, Image):  
+    def on_press(self):
+        globalVars.ScreenManager.transition = SlideTransition(direction='right')
+        globalVars.screenManager.current = "Start"
 
+Builder.load_string("""  
+<ImageButton>:  
+    source:'Icons/back.png'  
+    size_hint: 0.05, 0.05 
+""")  
 
 class AiResultScreen(GridLayout):
     def __init__(self, **kwargs):
@@ -25,38 +39,56 @@ class AiResultScreen(GridLayout):
 
         self.noOfWeights = 0
         self.weightSimulate = 0
-        
+        self.fileName = ''
         self.cols = 1
 
-        self.add_widget(Label(text='RESULT SCREEN'))
+        topLine = BoxLayout(orientation='horizontal', spacing=10)
+        topLine.add_widget(Label(text='', size_hint=(0.05, 1)))
+        topLine.add_widget(ImageButton(size_hint=(.1, 1)))
+        topLine.add_widget(Label(text='RESULT SCREEN', size_hint=(.7, 1)))
+        topLine.add_widget(Label(text='', size_hint=(0.15, 1)))
+        self.add_widget(topLine)
+
 ################################## IMPORT BUTTON #################################################################################
+        mainGrid = GridLayout(cols=1, row_force_default=True, row_default_height=30)
+
         importLine = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40)
         importBut = Button(text="Import population", size_hint_x=None, width=150)
         importBut.bind(on_press=self.importButton)
         importLine.add_widget(Label())
         importLine.add_widget(importBut)
         importLine.add_widget(Label())
-        self.add_widget(importLine)
+        mainGrid.add_widget(importLine)
+
+        mainGrid.add_widget(Label())
 
 ################################## INFO LABELS #################################################################################
-        infoGrid = GridLayout(cols=2, rows=3, row_force_default=True, row_default_height=30)
+        infoGrid = GridLayout(cols=2, rows=8, row_force_default=True, row_default_height=15)
         infoGrid.add_widget(Label(text='Date of training:'))
         self.dateLabel = Label(text='')
         infoGrid.add_widget(self.dateLabel)
 
-        snakeGrid = GridLayout(cols=2, row_force_default=True, row_default_height=30)
+        infoGrid.add_widget(Label())
+        infoGrid.add_widget(Label())
+
+        snakeGrid = GridLayout(cols=3, row_force_default=True, row_default_height=30)
+        snakeGrid.add_widget(Label(size_hint_x=None, width=10))
         snakeGrid.add_widget(Label(text='Total snakes:'))
-        self.allSnakesLabel = Label(text='', width=20)
+        self.allSnakesLabel = Label(text='')
         snakeGrid.add_widget(self.allSnakesLabel)
         infoGrid.add_widget(snakeGrid)
 
         snakeGrid2 = GridLayout(cols=2, row_force_default=True, row_default_height=30)
         snakeGrid2.add_widget(Label(text='Snakes in 1 gen.:'))
-        self.snakes1Label = Label(text='', width=20)
+        self.snakes1Label = Label(text='')
         snakeGrid2.add_widget(self.snakes1Label)
         infoGrid.add_widget(snakeGrid2)
 
-        selGrid = GridLayout(cols=2, row_force_default=True, row_default_height=30)
+        infoGrid.add_widget(Label())
+        infoGrid.add_widget(Label())
+
+        selGrid = GridLayout(cols=3, row_force_default=True, row_default_height=30)
+        selGrid.add_widget(Label(size_hint_x=None, width=10))
         selGrid.add_widget(Label(text='Select. rate:'))
         self.selectionLabel = Label(text='')
         selGrid.add_widget(self.selectionLabel)
@@ -68,16 +100,29 @@ class AiResultScreen(GridLayout):
         mutGrid.add_widget(self.mutationLabel)
         infoGrid.add_widget(mutGrid)
 
-        self.add_widget(infoGrid)
+        infoGrid.add_widget(Label())
+        infoGrid.add_widget(Label())
+        infoGrid.add_widget(Label())
+        infoGrid.add_widget(Label())
 
-################################## SHOW GRAPHS #################################################################################
-        btnGraphLine = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40)
-        graphBut = Button(text="Show graphs", size_hint_x=None, width=150)
-        graphBut.bind(on_press=self.openGraphs)
-        btnGraphLine.add_widget(Label())
-        btnGraphLine.add_widget(graphBut)
-        btnGraphLine.add_widget(Label())
-        self.add_widget(btnGraphLine)
+        net1Grid = GridLayout(cols=3, row_force_default=True, row_default_height=25)
+        net1Grid.add_widget(Label(size_hint_x=None, width=10))
+        net1Grid.add_widget(Label(text='Neurons in\n   1. layer:'))
+        self.noNeuron1Label = Label(text='')
+        net1Grid.add_widget(self.noNeuron1Label)
+        infoGrid.add_widget(net1Grid)
+
+        net2Grid = GridLayout(cols=2, row_force_default=True, row_default_height=25)
+        net2Grid.add_widget(Label(text='Neurons in\n   2. layer:'))
+        self.noNeuron2Label = Label(text='')
+        net2Grid.add_widget(self.noNeuron2Label)
+        infoGrid.add_widget(net2Grid)
+
+        mainGrid.add_widget(infoGrid)
+
+        self.add_widget(mainGrid)
+
+        self.add_widget(Label())
 
 ################################## SLIDER #################################################################################
         sliderLine = GridLayout(cols=1, rows=3, row_force_default=True, row_default_height=30)
@@ -111,46 +156,49 @@ class AiResultScreen(GridLayout):
         dimLine.add_widget(Label(text='cell/s', size_hint_x=None, width=50))
         self.add_widget(dimLine)
 
-################################## SIMULATE SNAKE #################################################################################
-        btnSimLine = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40)
+################################## SIMULATE SNAKE, SHOW GRAPHS #################################################################################
+        btnSimLine = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=40)
         simSnakeBut = Button(text="Simulate snake", size_hint_x=None, width=150)
         simSnakeBut.bind(on_press=self.simSnakeButton)
         btnSimLine.add_widget(Label())
         btnSimLine.add_widget(simSnakeBut)
         btnSimLine.add_widget(Label())
-        self.add_widget(btnSimLine)
 
-################################## GO BACK #################################################################################
-        btnLine = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40)
-        goStartBut = Button(text='Go back', size_hint_x=None, width=150)
-        goStartBut.bind(on_press=self.goStartButton)
-        btnLine.add_widget(Label())
-        btnLine.add_widget(goStartBut)
-        btnLine.add_widget(Label())
-        self.add_widget(btnLine)
+        graphBut = Button(text="Show graphs", size_hint_x=None, width=150)
+        graphBut.bind(on_press=self.openGraphs)
+        btnSimLine.add_widget(graphBut)
+        btnSimLine.add_widget(Label())
+        self.add_widget(btnSimLine)
 
 
     def onChangeSliderValue(self, instance, val):
         self.actSliderValLabel.text = str(int(val))
         self.weightSimulate = int(val)
 
-    def goStartButton(self, instance):
-        globalVars.screenManager.current = "Start"
-
     def simSnakeButton(self, instance):
-        fieldSize = str(int(self.fieldSizeTI.text))
-        snakeSpeed = str(float(self.snakeSpeedTI.text))
-        from subprocess import Popen
-        Popen(['python', 'simulateSnake.py', fieldSize, snakeSpeed, self.fileName, str(self.weightSimulate)])
+        if self.fileName == '':
+            self.popupShow()
+        else:
+
+            fieldSize = str(int(self.fieldSizeTI.text))
+            snakeSpeed = str(float(self.snakeSpeedTI.text))
+            from subprocess import Popen
+            Popen(['python', 'simulateSnake.py', fieldSize, snakeSpeed, self.fileName, str(self.weightSimulate)])
+
 
     def importButton(self, instance):
         self.fileName = filedialog.askopenfilename(initialdir="/", title="Import population", filetypes=(("CSV", "*.csv"), ("All files", "*.*")))
-        importThrHandle = threading.Thread(target=self.importThread, daemon=True)
-        importThrHandle.start()
+        if self.fileName:
+            importThrHandle = threading.Thread(target=self.importThread, daemon=True)
+            importThrHandle.start()
+
 
     def openGraphs(self, instance):
-        from subprocess import Popen
-        Popen(['python', 'graphs.py', str(self.fileName), '0'])
+        if self.fileName == '':
+            self.popupShow()
+        else:
+            from subprocess import Popen
+            Popen(['python', 'graphs.py', str(self.fileName), '0'])
 
 
     def importThread(self):
@@ -180,11 +228,11 @@ class AiResultScreen(GridLayout):
                 elif lineCount == 3:
                     mutationRate = row[1]
                 elif lineCount == 4:
-                    self.noOfInputs = row[1]
+                    noOfInputs = row[1]
                 elif lineCount == 5:
-                    self.noOfNeuron1Layer = row[1]
+                    noOfNeuron1Layer = row[1]
                 elif lineCount == 6:
-                    self.noOfNeuron2Layer = row[1]
+                    noOfNeuron2Layer = row[1]
                 if row[0] == 'weights':
                     self.noOfWeights += 1
                 lineCount += 1
@@ -195,6 +243,19 @@ class AiResultScreen(GridLayout):
             self.allSnakesLabel.text = str(int(noOfSnakes) * int(self.noOfWeights))
             self.selectionLabel.text = selectionRate
             self.mutationLabel.text = mutationRate
+            self.noNeuron1Label.text = noOfNeuron1Layer
+            self.noNeuron2Label.text = noOfNeuron2Layer
+
+    def popupShow(self):
+        layout = GridLayout(cols = 1, padding = 10) 
+        popupLabel1 = Label(text = "NO file selected") 
+        popupLabel2 = Label(text = "IMPORT file with population of snakes") 
+        layout.add_widget(popupLabel1) 
+        layout.add_widget(popupLabel2) 
+        popup = Popup(title ='INFO', 
+                        content = layout, 
+                        size_hint =(None, None), size =(300, 150))   
+        popup.open()            
 
 
 

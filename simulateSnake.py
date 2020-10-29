@@ -61,7 +61,7 @@ class SimulateScreen(GridLayout):
         self.event = Clock.schedule_interval(self.drawScreen, 1/self.snakeSpeed)
 
         self.snake = Snake(intelligence=True,fieldSize=self.fieldSize-2)
-        self.snake.importBrain(self.weights[self.indexWeight])
+        self.snake.importBrain(rates=self.weights[self.indexWeight],  noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
 
     def drawScreen(self, instance):
@@ -83,6 +83,10 @@ class SimulateScreen(GridLayout):
             csv_reader = csv.reader(csv_file, delimiter=',')
             self.weights = []
             for row in csv_reader:
+                if row[0] == 'noOfNeuron1Layer':
+                    self.noOfNeuron1Layer = int(row[1])
+                if row[0] == 'noOfNeuron2Layer':
+                    self.noOfNeuron2Layer = int(row[1])
                 if row[0] == 'weights':
                     self.weights.append(list(map(float, row[1][1:-1].split(','))))
 

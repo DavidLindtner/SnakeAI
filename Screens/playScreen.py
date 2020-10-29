@@ -1,5 +1,6 @@
 import kivy
 from kivy.uix.gridlayout import GridLayout
+from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.textinput import TextInput
@@ -10,11 +11,33 @@ from kivy.graphics import Color, Rectangle
 from kivy.properties import ListProperty
 from kivy.factory import Factory
 from kivy.lang import Builder
+from kivy.uix.behaviors import ButtonBehavior  
+from kivy.uix.image import Image  
+from kivy.uix.screenmanager import SlideTransition
 
 from Globals import globalVars
 from Globals import globalFcns
 
 from snakeBody import Snake
+
+
+class ImageButton(ButtonBehavior, Image):  
+    def on_press(self):
+        globalVars.ScreenManager.transition = SlideTransition(direction='right')
+        globalVars.screenManager.current = "Start"
+
+        if globalVars.buttonPressed.goStartButton == 1:
+            globalVars.buttonPressed.goStartButton = 0
+        else:
+            globalVars.buttonPressed.goStartButton = 1
+
+
+
+Builder.load_string("""  
+<ImageButton>:  
+    source:'Icons/back.png'  
+    size_hint: 0.05, 0.05 
+""")  
 
 
 Builder.load_string("""
@@ -45,24 +68,26 @@ class PlayScreen(GridLayout):
         self._keyboard.bind(on_key_down=self._on_keyboard_down)
 
         self.cols = 1
-
-        self.field = GridLayout(cols=globalVars.fieldSize, rows=globalVars.fieldSize, row_force_default=False, row_default_height=Window.size[0]/globalVars.fieldSize-1, spacing=1)
+        
+############################## FILL PLAY SCREEN ################################################
+        field = GridLayout(cols=globalVars.fieldSize, rows=globalVars.fieldSize, row_force_default=False, row_default_height=Window.size[0]/globalVars.fieldSize-1, spacing=1)
 
         self.screenCell = []
 
         for i in range(globalVars.fieldSize * globalVars.fieldSize):
             self.screenCell.append(LabelB(bcolor=(0,0,0,1)))
-            self.field.add_widget(self.screenCell[i])
+            field.add_widget(self.screenCell[i])
 
-        self.add_widget(self.field)
+        self.add_widget(field)
         
-
+############################## SPACING ################################################
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
 
+############################## COUNTER LABEL 3 2 1 PLAY ################################################
         self.playBar = Label(text="3", color=(0,1,0,1), font_size='40sp')
         self.add_widget(self.playBar)
 
@@ -71,6 +96,7 @@ class PlayScreen(GridLayout):
         self.scoreLabel = Label(text='1', font_size='20sp', size_hint_x=None, width=50)
         self.movesLabel = Label(text='0', font_size='20sp', size_hint_x=None, width=50)
 
+############################## SCORE MOVES ################################################
         scoreLine.add_widget(Label())
         scoreLine.add_widget(Label(text='Score:', font_size='20sp', size_hint_x=None, width=100))
         scoreLine.add_widget(self.scoreLabel)
@@ -81,7 +107,7 @@ class PlayScreen(GridLayout):
 
         self.add_widget(scoreLine)
 
-
+############################## LABELS INFO ################################################
         foodLine = GridLayout(cols=7, rows=1, row_force_default=True, row_default_height=60)
         self.movesWithoutFoodLabel = Label(text='0', font_size='18sp', size_hint_x=None, width=50)
         self.foodMovesRatioLabel = Label(text='0', font_size='18sp', size_hint_x=None, width=50)
@@ -96,20 +122,18 @@ class PlayScreen(GridLayout):
 
         self.add_widget(foodLine)
 
+############################## BUTTONS ################################################
+        botLine = BoxLayout(orientation='horizontal', spacing=10)
+        playAgainBut = Button(text="Play again", size_hint=(0.4, 0.6))
+        playAgainBut.bind(on_press=self.playAgainButton)
+        botLine.add_widget(Label(text='', size_hint=(0.05, 0.6)))
+        botLine.add_widget(ImageButton(size_hint=(.1, 0.6)))
+        botLine.add_widget(Label(text='', size_hint=(0.1, 0.6)))
+        botLine.add_widget(playAgainBut)
+        botLine.add_widget(Label(text='', size_hint=(0.25, 0.6)))
+        self.add_widget(botLine)
 
-        btnLine = GridLayout(cols=5, rows=2, row_force_default=True, row_default_height=40)
-
-        self.playAgainBut = Button(text="Play again", size_hint_x=None, width=100)
-        self.goStartBut = Button(text="Go to start", size_hint_x=None, width=100)
-        btnLine.add_widget(Label(text=""))
-        btnLine.add_widget(self.playAgainBut)
-        btnLine.add_widget(Label(text=""))
-        btnLine.add_widget(self.goStartBut)
-        btnLine.add_widget(Label(text=""))
-        self.playAgainBut.bind(on_press=self.playAgainButton)
-        self.goStartBut.bind(on_press=self.goStartButton)
-
-        self.add_widget(btnLine)
+        self.add_widget(Label())
 
         self.snake = Snake()
 
@@ -137,12 +161,8 @@ class PlayScreen(GridLayout):
 
     def drawScreen(self, instance):
         if self.snake.snakeStep(Xdir = self.moveX, Ydir = self.moveY):
-            #print("fitness")
-            #print(self.snake.fitness)
             self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
         else:
-            #print("fitness")
-            #print(self.snake.fitness)
             if self.snake.win:
                 self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
                 self.event.cancel()
@@ -179,18 +199,6 @@ class PlayScreen(GridLayout):
         self.moveX = 0
         self.moveY = 0
         self.newGame()
-
-    def goStartButton(self, instance):
-        try:
-            self.event.cancel()
-        except:
-            pass
-        globalVars.screenManager.current = "Start"
-
-        if globalVars.buttonPressed.goStartButton == 1:
-            globalVars.buttonPressed.goStartButton = 0
-        else:
-            globalVars.buttonPressed.goStartButton = 1
 
     def newGame(self):
         self.playBar.text = "3"

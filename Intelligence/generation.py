@@ -9,8 +9,11 @@ from Intelligence.crossover import Crossover
 
 
 class Generation():
-    def __init__(self, noOfSnakes, selectionRate, mutationRate=0):
+    def __init__(self, noOfSnakes, selectionRate, noNeuron1Layer, noNeuron2Layer, mutationRate=0):
         self.noOfThreads = 3
+
+        self.noOfNeuron1Layer = noNeuron1Layer
+        self.noOfNeuron2Layer = noNeuron2Layer
 
         self.noOfSnakes = noOfSnakes
         self.mutationRate = mutationRate
@@ -22,9 +25,9 @@ class Generation():
         if not parents:
             for i in range(self.noOfSnakes):
                 self.snakes.append(Snake(intelligence=True))
-                self.snakes[i].randomBrain()
+                self.snakes[i].randomBrain(noOfNeuron1 = self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
         else:
-            cross = Crossover(inSnakes=parents.copy(), noOfOutSnakes=self.noOfSnakes, mutationRate=self.mutationRate)
+            cross = Crossover(inSnakes=parents.copy(), noOfOutSnakes=self.noOfSnakes, mutationRate=self.mutationRate, noNeuron1Layer=self.noOfNeuron1Layer, noNeuron2Layer=self.noOfNeuron2Layer)
             self.snakes = cross.onePointCrossover()
             del cross
 
