@@ -31,12 +31,12 @@ from Intelligence.generation import Generation
 
 class ImageButton(ButtonBehavior, Image):  
     def on_press(self):
-        globalVars.ScreenManager.transition = SlideTransition(direction='right')
+        globalVars.ScreenManager.transition = SlideTransition(direction='left')
         globalVars.screenManager.current = "Start"
 
 Builder.load_string("""  
 <ImageButton>:  
-    source:'Icons/back.png'  
+    source:'Icons/front.png'  
     size_hint: 0.05, 0.05
 """)  
 
@@ -46,8 +46,8 @@ class AiScreen(GridLayout):
         self.generate = False
         self.noOfSnakes = 200
         self.noOfGenerations = 0
-        self.noOfNeuron1Layer = 18
-        self.noOfNeuron2Layer = 12
+        self.noOfNeuron1Layer = 12
+        self.noOfNeuron2Layer = 8
         self.snakes = []
         self.bestSnakes = []
         self.fitness = []
@@ -57,10 +57,10 @@ class AiScreen(GridLayout):
         self.cols = 1
 ############################## BACK TITLE ###########################################################################
         topLine = BoxLayout(orientation='horizontal', spacing=10)
-        topLine.add_widget(Label(text='', size_hint=(0.05, 1)))
-        topLine.add_widget(ImageButton(size_hint=(.1, 1)))
-        topLine.add_widget(Label(text='SNAKE AI', size_hint=(.7, 1)))
         topLine.add_widget(Label(text='', size_hint=(0.15, 1)))
+        topLine.add_widget(Label(text='SNAKE AI', size_hint=(.7, 1)))
+        topLine.add_widget(ImageButton(source='Icons/front.png', size_hint=(.1, 1)))
+        topLine.add_widget(Label(text='', size_hint=(0.05, 1)))
         self.add_widget(topLine)
 
 ############################## NUMBER OF SNAKES ###########################################################################
@@ -78,7 +78,7 @@ class AiScreen(GridLayout):
         num1SnakeLine.add_widget(self.selectionRateTI)
 
         num1SnakeLine.add_widget(Label(text='Mutation rate', size_hint_x=None, width=150))
-        self.mutationRateTI = TextInput(multiline=False, text=str(0.01), size_hint_x=None, width=40)
+        self.mutationRateTI = TextInput(multiline=False, text=str(0.05), size_hint_x=None, width=40)
         num1SnakeLine.add_widget(self.mutationRateTI)
 
         self.add_widget(num1SnakeLine)
@@ -145,9 +145,15 @@ class AiScreen(GridLayout):
         if self.generate == 0:
             self.popupGraphsShow()
         else:
-            from subprocess import Popen
-            Popen(['python', 'graphs.py', str(self.graphName), '1'])
+            openG = threading.Thread(target=self.openGraphsThr)
+            openG.start()
 
+    def openGraphsThr(self):
+        from subprocess import Popen
+        if globalVars.executable:
+            Popen(['graphs.exe', str(self.graphName), '1'])
+        else:
+            Popen(['python', 'graphs.py', str(self.graphName), '1'])
 
     def writeDataGraphs(self, score, gen, fit, sec):
         with open(self.graphName, 'a') as f:

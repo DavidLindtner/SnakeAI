@@ -88,7 +88,7 @@ class Snake():
         
         self.snakeMove()
         self.calculateFitness()
-        #self.countVision()
+        
 
         #   hit snake
         if self.field[self.parts[0]] == 1:
@@ -117,6 +117,7 @@ class Snake():
         if len(self.parts) >= 2:
             self.field[self.parts[1]] = 1
 
+        #self.countVision()
         return True
 
 
@@ -192,7 +193,7 @@ class Snake():
 
 
     def calculateFitness(self):
-        self.fitness = self.score*self.score*self.score*self.score + self.noOfMoves
+        self.fitness = self.score * 100 + self.noOfMoves
 
     def countVision(self):
         #   BORDER
@@ -235,52 +236,8 @@ class Snake():
         for i in range(8):
             if self.distWall[i] == 0:
                 self.seeWall[i] = 10
-                
-        self.reverseDistWall = [0] * 8
-        for i in range(8):
-            self.reverseDistWall[i] = self.fieldSize - self.distWall[i]
-
-
-        self.distFood = [0] * 8
-        #   SEE FOOD
-        for i in range(8):
-            while self.field[position] != 3 and self.field[position] != 4:
-                if i == 0:
-                    position = position + 1
-                    counter += 1
-                elif i == 1:
-                    position = position - self.fieldSize + 1
-                    counter += 1
-                elif i == 2:
-                    position = position - self.fieldSize
-                    counter += 1
-                elif i == 3:
-                    position = position - self.fieldSize - 1
-                    counter += 1
-                elif i == 4:
-                    position = position - 1
-                    counter += 1
-                elif i == 5:
-                    position = position + self.fieldSize - 1
-                    counter += 1
-                elif i == 6:
-                    position = position + self.fieldSize
-                    counter += 1
-                else:
-                    position = position + self.fieldSize + 1
-                    counter += 1
-
-            self.distFood[i] = counter-1
-
-            position = self.parts[0]
-            counter = 0
-            
-        for i in range(8):
-            if self.distFood[i] != self.distWall[i]:
-                self.seeFood[i] = 10
-            else:
-                self.seeFood[i] = 0
-                self.distFood[i] = self.fieldSize
+            elif self.distWall[i] == 1:
+                self.seeWall[i] = 5
 
 
         #   SEE SNAKE
@@ -317,10 +274,56 @@ class Snake():
             counter = 0
             
         for i in range(8):
-            if self.distSnake[i] != self.distWall[i]:
+            if self.distSnake[i] != self.distWall[i] and self.distSnake[i] == 0:
                 self.seeSnake[i] = 10
+            elif self.distSnake[i] != self.distWall[i] and self.distSnake[i] == 1:
+                self.seeSnake[i] = 5
             else:
                 self.seeSnake[i] = 0
+
+        #print(self.seeSnake)
+        self.distFood = [0] * 8
+      
+        #   SEE FOOD
+        for i in range(8):
+            while self.field[position] != 3 and self.field[position] != 4 and self.field[position] != 1:
+                if i == 0:
+                    position = position + 1
+                    counter += 1
+                elif i == 1:
+                    position = position - self.fieldSize + 1
+                    counter += 1
+                elif i == 2:
+                    position = position - self.fieldSize
+                    counter += 1
+                elif i == 3:
+                    position = position - self.fieldSize - 1
+                    counter += 1
+                elif i == 4:
+                    position = position - 1
+                    counter += 1
+                elif i == 5:
+                    position = position + self.fieldSize - 1
+                    counter += 1
+                elif i == 6:
+                    position = position + self.fieldSize
+                    counter += 1
+                else:
+                    position = position + self.fieldSize + 1
+                    counter += 1
+
+            self.distFood[i] = counter-1
+            position = self.parts[0]
+            counter = 0
+            
+        for i in range(8):
+            if self.distFood[i] != self.distWall[i] and self.distFood[i] != self.distSnake[i]:
+                self.seeFood[i] = 10
+            else:
+                self.seeFood[i] = 0
+                self.distFood[i] = self.fieldSize
+        
+        #print(self.seeFood)
 
         self.lastMove = [0] * 4
 

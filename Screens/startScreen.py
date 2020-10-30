@@ -73,14 +73,14 @@ class StartScreen(GridLayout):
         else:
             globalVars.buttonPressed.playButton = 1
 
-        globalVars.ScreenManager.transition = SlideTransition(direction='left')
+        globalVars.ScreenManager.transition = SlideTransition(direction='down')
         globalVars.screenManager.current = "Play"
 
     def aiConfButton(self, instance):
         globalVars.fieldSize = int(self.fieldSizeTI.text) + 2
         globalVars.snakeSpeed = float(self.snakeSpeedTI.text)
 
-        globalVars.ScreenManager.transition = SlideTransition(direction='left')
+        globalVars.ScreenManager.transition = SlideTransition(direction='right')
         globalVars.screenManager.current = "AiConf"
 
     def aiResButton(self, instance):

@@ -37,7 +37,7 @@ class SimulateScreen(GridLayout):
     def __init__(self, **kwargs):
         super(SimulateScreen, self).__init__(**kwargs)
 
-        Window.size = (400, 400)
+        Window.size = (400, 500)
 
         self.fieldSize = int(sys.argv[1])+2
         self.snakeSpeed = float(sys.argv[2])
@@ -48,21 +48,46 @@ class SimulateScreen(GridLayout):
 
         self.cols = 1
 
-        self.field = GridLayout(cols=self.fieldSize, rows=self.fieldSize, row_force_default=False, row_default_height=Window.size[0]/self.fieldSize-1, spacing=1)
+########################### SIMULATION FIELD #############################################################
+        field = GridLayout(cols=self.fieldSize, rows=self.fieldSize, row_force_default=False, row_default_height=Window.size[0]/self.fieldSize-1, spacing=1)
 
         self.screenCell = []
 
         for i in range(self.fieldSize * self.fieldSize):
             self.screenCell.append(LabelB(bcolor=(0,0,0,1)))
-            self.field.add_widget(self.screenCell[i])
+            field.add_widget(self.screenCell[i])
 
-        self.add_widget(self.field)
+        self.add_widget(field)
+
+########################### SIMULATE AGAIN BUTTON #############################################################
+        self.add_widget(Label())
+        self.add_widget(Label())
+        self.add_widget(Label())
+        self.add_widget(Label())
+        self.add_widget(Label())
+
+        againLine = GridLayout(cols=3, row_force_default=True, row_default_height=40)
+        againBut = Button(text='Again', size_hint_x=None, width=150)
+        againBut.bind(on_press=self.againButton)
+        againLine.add_widget(Label())
+        againLine.add_widget(againBut)
+        againLine.add_widget(Label())
+        self.add_widget(againLine)
+
+        self.snake = Snake(intelligence=True,fieldSize=self.fieldSize-2)
+        self.snake.importBrain(rates=self.weights[self.indexWeight].copy(),  noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
         self.event = Clock.schedule_interval(self.drawScreen, 1/self.snakeSpeed)
 
-        self.snake = Snake(intelligence=True,fieldSize=self.fieldSize-2)
-        self.snake.importBrain(rates=self.weights[self.indexWeight],  noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
+    def againButton(self, instance):
+        self.event.cancel()
+        del self.snake
+
+        self.snake = Snake(intelligence=True,fieldSize=self.fieldSize-2)
+        self.snake.importBrain(rates=self.weights[self.indexWeight].copy(),  noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
+
+        self.event = Clock.schedule_interval(self.drawScreen, 1/self.snakeSpeed)
 
     def drawScreen(self, instance):
         if self.snake.snakeStep():

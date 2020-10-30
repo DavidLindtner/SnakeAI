@@ -151,7 +151,7 @@ class AiResultScreen(GridLayout):
         dimLine.add_widget(Label(text='cells', size_hint_x=None, width=50))
 
         dimLine.add_widget(Label(text='Speed', size_hint_x=None, width=200))
-        self.snakeSpeedTI = TextInput(multiline=False, text=str(globalVars.snakeSpeed), size_hint_x=None, width=50)
+        self.snakeSpeedTI = TextInput(multiline=False, text=str(30), size_hint_x=None, width=50)
         dimLine.add_widget(self.snakeSpeedTI)
         dimLine.add_widget(Label(text='cell/s', size_hint_x=None, width=50))
         self.add_widget(dimLine)
@@ -179,10 +179,16 @@ class AiResultScreen(GridLayout):
         if self.fileName == '':
             self.popupShow()
         else:
+            simS = threading.Thread(target=self.simSnakeThr)
+            simS.start()
 
-            fieldSize = str(int(self.fieldSizeTI.text))
-            snakeSpeed = str(float(self.snakeSpeedTI.text))
-            from subprocess import Popen
+    def simSnakeThr(self):
+        fieldSize = str(int(self.fieldSizeTI.text))
+        snakeSpeed = str(float(self.snakeSpeedTI.text))
+        from subprocess import Popen
+        if globalVars.executable:
+            Popen(['simulateSnake.exe', fieldSize, snakeSpeed, self.fileName, str(self.weightSimulate)])
+        else:
             Popen(['python', 'simulateSnake.py', fieldSize, snakeSpeed, self.fileName, str(self.weightSimulate)])
 
 
@@ -197,7 +203,14 @@ class AiResultScreen(GridLayout):
         if self.fileName == '':
             self.popupShow()
         else:
-            from subprocess import Popen
+            openG = threading.Thread(target=self.openGraphsThr)
+            openG.start()
+
+    def openGraphsThr(self):
+        from subprocess import Popen
+        if globalVars.executable:
+            Popen(['graphs.exe', str(self.fileName), '0'])
+        else:
             Popen(['python', 'graphs.py', str(self.fileName), '0'])
 
 

@@ -57,6 +57,7 @@ def net2list(w1, w2, w3, b1, b2, b3):
 
     return rates
 
+
 def list2net(w1Sh, w2Sh, w3Sh, b1Sh, b2Sh, b3Sh, rates):
     w1 = np.zeros(w1Sh)
     for i in range(w1Sh[0]):

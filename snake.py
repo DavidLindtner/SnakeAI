@@ -1,3 +1,7 @@
+#   pyinstaller snake.py --onefile --noconsole --icon Icons\snake.ico
+#   pyinstaller graphs.py --onefile --noconsole
+#   pyinstaller simulateSnake.py --onefile --noconsole
+
 import kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -22,7 +26,7 @@ class SnakeAI(App):
 
     def build(self):
         self.icon = 'Icons/snake.png'
-        
+
         self.root = tk.Tk()
         self.root.withdraw()
 

@@ -23,7 +23,7 @@ from snakeBody import Snake
 
 class ImageButton(ButtonBehavior, Image):  
     def on_press(self):
-        globalVars.ScreenManager.transition = SlideTransition(direction='right')
+        globalVars.ScreenManager.transition = SlideTransition(direction='up')
         globalVars.screenManager.current = "Start"
 
         if globalVars.buttonPressed.goStartButton == 1:
@@ -35,7 +35,7 @@ class ImageButton(ButtonBehavior, Image):
 
 Builder.load_string("""  
 <ImageButton>:  
-    source:'Icons/back.png'  
+    source:'Icons/down.png'  
     size_hint: 0.05, 0.05 
 """)  
 
@@ -86,6 +86,8 @@ class PlayScreen(GridLayout):
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
+        self.add_widget(Label())
+        self.add_widget(Label())
 
 ############################## COUNTER LABEL 3 2 1 PLAY ################################################
         self.playBar = Label(text="3", color=(0,1,0,1), font_size='40sp')
@@ -124,13 +126,13 @@ class PlayScreen(GridLayout):
 
 ############################## BUTTONS ################################################
         botLine = BoxLayout(orientation='horizontal', spacing=10)
-        playAgainBut = Button(text="Play again", size_hint=(0.4, 0.6))
+        playAgainBut = Button(text="Play again", size_hint=(0.4, 0.7))
         playAgainBut.bind(on_press=self.playAgainButton)
-        botLine.add_widget(Label(text='', size_hint=(0.05, 0.6)))
-        botLine.add_widget(ImageButton(size_hint=(.1, 0.6)))
-        botLine.add_widget(Label(text='', size_hint=(0.1, 0.6)))
+        botLine.add_widget(Label(text='', size_hint=(0.05, 0.7)))
+        botLine.add_widget(ImageButton(source='Icons/down.png', size_hint=(.1, 0.7)))
+        botLine.add_widget(Label(text='', size_hint=(0.1, 0.7)))
         botLine.add_widget(playAgainBut)
-        botLine.add_widget(Label(text='', size_hint=(0.25, 0.6)))
+        botLine.add_widget(Label(text='', size_hint=(0.25, 0.7)))
         self.add_widget(botLine)
 
         self.add_widget(Label())
