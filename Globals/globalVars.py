@@ -23,7 +23,7 @@ def init():
     snakeSpeekSimulate = 4
     buttonPressed = ButtonPressed()
     icon = 'snake.png'
-    executable = True
+    executable = False
 
 
 
