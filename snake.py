@@ -6,6 +6,7 @@ import kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.core.window import Window
+from kivy.config import Config 
 
 import tkinter as tk
 
@@ -16,16 +17,15 @@ from Screens.playScreen import PlayScreen
 from Screens.aiScreen import AiScreen
 from Screens.aiResultsScreen import AiResultScreen
 
-
 kivy.require("1.11.1")
 
 globalVars.init()
-
 
 class SnakeAI(App):
 
     def build(self):
         self.icon = 'Icons/snake.png'
+
 
         self.root = tk.Tk()
         self.root.withdraw()
@@ -64,6 +64,5 @@ class SnakeAI(App):
         globalVars.screenManager.remove_widget(self.screenPlay)
 
 if __name__ == '__main__':
-
     snakeApp = SnakeAI()
     snakeApp.run()

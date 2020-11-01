@@ -66,13 +66,18 @@ class SimulateScreen(GridLayout):
         self.add_widget(Label())
         self.add_widget(Label())
 
-        againLine = GridLayout(cols=3, row_force_default=True, row_default_height=40)
+        againLine = GridLayout(cols=6, row_force_default=True, row_default_height=40)
         againBut = Button(text='Again', size_hint_x=None, width=150)
         againBut.bind(on_press=self.againButton)
         againLine.add_widget(Label())
         againLine.add_widget(againBut)
         againLine.add_widget(Label())
+        againLine.add_widget(Label(text='Score:'))
+        self.scoreLabel = Label(text='1')
+        againLine.add_widget(self.scoreLabel)
+        againLine.add_widget(Label())
         self.add_widget(againLine)
+        
 
         self.snake = Snake(intelligence=True,fieldSize=self.fieldSize-2)
         self.snake.importBrain(rates=self.weights[self.indexWeight].copy(),  noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
@@ -90,6 +95,7 @@ class SimulateScreen(GridLayout):
         self.event = Clock.schedule_interval(self.drawScreen, 1/self.snakeSpeed)
 
     def drawScreen(self, instance):
+        self.scoreLabel.text = str(self.snake.score)
         if self.snake.snakeStep():
             self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
         else:
