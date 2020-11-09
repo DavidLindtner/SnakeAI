@@ -25,13 +25,14 @@ class Brain():
         self.randomWeights()
 
     def randomWeights(self):
-        self.weights1 = (2 * np.random.random((self.noOfNeuron1Layer, self.noOfInputs)) - 1) * 1
-        self.weights2 = (2 * np.random.random((self.noOfNeuron2Layer, self.noOfNeuron1Layer)) - 1) * 1
-        self.weights3 = (2 * np.random.random((self.noOfOutputs, self.noOfNeuron2Layer)) - 1) * 1
+        strength = 0.2
+        self.weights1 = (2 * np.random.random((self.noOfNeuron1Layer, self.noOfInputs)) - 1) * strength
+        self.weights2 = (2 * np.random.random((self.noOfNeuron2Layer, self.noOfNeuron1Layer)) - 1) *strength
+        self.weights3 = (2 * np.random.random((self.noOfOutputs, self.noOfNeuron2Layer)) - 1) * strength
 
-        self.bias1 = (2 * np.random.random((self.noOfInputs, 1)) - 1) * 1
-        self.bias2 = (2 * np.random.random((self.noOfNeuron1Layer, 1)) - 1) * 1
-        self.bias3 = (2 * np.random.random((self.noOfNeuron2Layer, 1)) - 1) * 1
+        self.bias1 = (2 * np.random.random((self.noOfInputs, 1)) - 1) * strength
+        self.bias2 = (2 * np.random.random((self.noOfNeuron1Layer, 1)) - 1) * strength
+        self.bias3 = (2 * np.random.random((self.noOfNeuron2Layer, 1)) - 1) * strength
 
         #print(self.weights1)
         #print(self.bias1)
@@ -54,14 +55,21 @@ class Brain():
         self.inputs = np.array(input)[np.newaxis]
         outBias1 = np.add(self.inputs.T, self.bias1)
 
-        self.neuron1Layer = np.dot(self.weights1, outBias1)
+        outL1 = self.relu(outBias1)
+
+        self.neuron1Layer = np.dot(self.weights1, outL1)
         outBias2 = np.add(self.neuron1Layer, self.bias2)
 
-        self.neuron2Layer = np.dot(self.weights2, outBias2)
+        outL2 = self.relu(outBias2)
+
+        self.neuron2Layer = np.dot(self.weights2, outL2)
         outBias3 = np.add(self.neuron2Layer, self.bias3)
 
-        self.neuronLastLayer = np.dot(self.weights3, outBias3)
+        outL3 = self.relu(outBias3)
+
+        self.neuronLastLayer = np.dot(self.weights3, outL3)
         self.outputs = self.sigmoid(self.neuronLastLayer)
+
         maxElement = np.argmax(self.outputs)
         self.outputList = [0] * 4
         self.outputList[maxElement] = 1
@@ -75,5 +83,10 @@ class Brain():
     def sigmoid(self, input):
         return 1 / (1 + np.exp(-input))
 
+    def silu(self, input):
+        return input*self.sigmoid(input)
+
+    def relu(self, input):
+        return input * (input > 0)
     
 

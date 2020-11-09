@@ -151,7 +151,7 @@ class AiResultScreen(GridLayout):
         dimLine.add_widget(Label(text='cells', size_hint_x=None, width=50))
 
         dimLine.add_widget(Label(text='Speed', size_hint_x=None, width=200))
-        self.snakeSpeedTI = TextInput(multiline=False, text=str(30), size_hint_x=None, width=50)
+        self.snakeSpeedTI = TextInput(multiline=False, text=str(100), size_hint_x=None, width=50)
         dimLine.add_widget(self.snakeSpeedTI)
         dimLine.add_widget(Label(text='cell/s', size_hint_x=None, width=50))
         self.add_widget(dimLine)

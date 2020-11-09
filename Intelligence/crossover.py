@@ -143,7 +143,7 @@ class Crossover():
 
 
     def mutation(self, Rates):
-        mutationStrength = 0.5
+        mutationStrength = 0.2
         for i in range(int(len(Rates) * self.mutationRate)):
             x = np.random.randint(len(Rates))
             Rates[x] += (2 * np.random.random() - 1) * mutationStrength
@@ -151,6 +151,10 @@ class Crossover():
         for i in range(int(len(Rates) * self.mutationRate / 5)):
             x = np.random.randint(len(Rates))
             Rates[x] += (2 * np.random.random() - 1) * mutationStrength * 5
+
+        for i in range(int(len(Rates) * self.mutationRate / 10)):
+            x = np.random.randint(len(Rates))
+            Rates[x] += (2 * np.random.random() - 1) * mutationStrength * 10
 
         return Rates
 

@@ -1,5 +1,6 @@
 from random import randint
 from kivy.core.window import Window
+import numpy as np
 
 from Globals import globalVars
 from Intelligence.brain import Brain
@@ -199,7 +200,7 @@ class Snake():
         #   BORDER
         position = self.parts[0]
         counter = 0
-
+        wallD = [0] * 8
         for i in range(8):
             while self.field[position] != 4:
                 if i == 0:
@@ -227,19 +228,18 @@ class Snake():
                     position = position + self.fieldSize + 1
                     counter += 1
 
-            self.distWall[i] = counter-1
+            wallD[i] = counter-1
 
             position = self.parts[0]
             counter = 0
 
         self.seeWall = [0] * 8
         for i in range(8):
-            if self.distWall[i] == 0:
-                self.seeWall[i] = 10
-            elif self.distWall[i] == 1:
-                self.seeWall[i] = 5
+            self.distWall[i] = self.expDist(wallD[i])
+            if wallD[i] == 0:
+                self.seeWall[i] = 1
 
-
+        snakeD = [0] * 8
         #   SEE SNAKE
         for i in range(8):
             while self.field[position] != 1 and self.field[position] != 4:
@@ -268,22 +268,24 @@ class Snake():
                     position = position + self.fieldSize + 1
                     counter += 1
 
-            self.distSnake[i] = counter-1
+            snakeD[i] = counter-1
 
             position = self.parts[0]
             counter = 0
             
         for i in range(8):
-            if self.distSnake[i] != self.distWall[i] and self.distSnake[i] == 0:
-                self.seeSnake[i] = 10
-            elif self.distSnake[i] != self.distWall[i] and self.distSnake[i] == 1:
-                self.seeSnake[i] = 5
+            if snakeD[i] != wallD[i]:
+                self.distSnake[i] = self.expDist(snakeD[i])
+                if snakeD[i] == 0:
+                    self.seeSnake[i] = 1
+                else:
+                    self.seeSnake[i] = 0
             else:
                 self.seeSnake[i] = 0
+                self.distSnake[i] = 0
 
         #print(self.seeSnake)
-        self.distFood = [0] * 8
-      
+        foodD = [0] * 8
         #   SEE FOOD
         for i in range(8):
             while self.field[position] != 3 and self.field[position] != 4 and self.field[position] != 1:
@@ -312,13 +314,14 @@ class Snake():
                     position = position + self.fieldSize + 1
                     counter += 1
 
-            self.distFood[i] = counter-1
+            foodD[i] = counter-1
             position = self.parts[0]
             counter = 0
             
         for i in range(8):
-            if self.distFood[i] != self.distWall[i] and self.distFood[i] != self.distSnake[i]:
-                self.seeFood[i] = 10
+            if foodD[i] != wallD[i] and foodD[i] != snakeD[i]:
+                self.seeFood[i] = 1
+                self.distFood[i] = self.expDist(foodD[i])
             else:
                 self.seeFood[i] = 0
                 self.distFood[i] = self.fieldSize
@@ -336,7 +339,7 @@ class Snake():
         elif self.moveX == 0 and self.moveY == -1:
             self.lastMove[3] = 1
 
-        self.see = self.seeWall + self.seeSnake + self.seeFood #+ self.lastMove
+        self.see = self.distWall + self.distSnake + self.seeFood
 
         #print(" ")
         #print("distWall : " + str(self.distWall))
@@ -345,3 +348,9 @@ class Snake():
         #print("seeSnake : " + str(self.seeSnake))
         #print("distSnake: " + str(self.distSnake))
         #print("distFood : " + str(self.distFood))
+
+
+    def expDist(self, distance):
+        # e^-x
+        out = np.exp(-distance)
+        return out

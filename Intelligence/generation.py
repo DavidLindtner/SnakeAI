@@ -10,7 +10,7 @@ from Intelligence.crossover import Crossover
 
 class Generation():
     def __init__(self, noOfSnakes, selectionRate, noNeuron1Layer, noNeuron2Layer, mutationRate=0):
-        self.noOfThreads = 3
+        self.noOfThreads = 4
 
         self.noOfNeuron1Layer = noNeuron1Layer
         self.noOfNeuron2Layer = noNeuron2Layer
@@ -28,7 +28,7 @@ class Generation():
                 self.snakes[i].randomBrain(noOfNeuron1 = self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
         else:
             cross = Crossover(inSnakes=parents.copy(), noOfOutSnakes=self.noOfSnakes, mutationRate=self.mutationRate, noNeuron1Layer=self.noOfNeuron1Layer, noNeuron2Layer=self.noOfNeuron2Layer)
-            self.snakes = cross.onePointCrossover()
+            self.snakes = cross.simpleCrossover()
             del cross
 
 
@@ -51,7 +51,7 @@ class Generation():
 
     def simulateSnakeThr(self, start, stop):
         for j in range(start, stop):
-            while  self.snakes[j].noWithoutFood < globalVars.fieldSize * globalVars.fieldSize:
+            while  self.snakes[j].noWithoutFood < globalVars.fieldSize * globalVars.fieldSize * 2:
                 if not self.snakes[j].snakeStep():
                     self.fitness[j] = self.snakes[j].fitness
                     break

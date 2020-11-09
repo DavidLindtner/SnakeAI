@@ -179,14 +179,15 @@ class AiScreen(GridLayout):
         self.bestFitness = []
 
         counterGen = 0
-        startTime = time.time()
+        startTime = 0
 
         while self.generate:
             if counterGen == 0:
-                generation = Generation(noOfSnakes=self.noOfSnakes,
-                                        selectionRate=float(self.selectionRateTI.text),
+                generation = Generation(noOfSnakes=int(self.noOfSnakes*10),
+                                        selectionRate=float(self.selectionRateTI.text)/10,
                                         noNeuron1Layer=self.noOfNeuron1Layer,
                                         noNeuron2Layer=self.noOfNeuron2Layer)
+                startTime = time.time()
                 generation.live()
                 bestSnakes = generation.exportBest()
                 score, fitness = generation.bestScoreFitness()
@@ -230,8 +231,8 @@ class AiScreen(GridLayout):
 
     def createDataCsv(self):
         now = datetime.now()
-        self.fileDateTime = now.strftime("%d.%m.%Y-%H:%M:%S")
-        initFileName = now.strftime("Population-%d-%m-%Y--%H-%M-%S")
+        self.fileDateTime = now.strftime("%Y.%m.%d-%H:%M:%S")
+        initFileName = now.strftime("Population-%Y-%m-%d--%H-%M-%S")
         self.fileName = filedialog.asksaveasfilename(initialdir="/", initialfile=initFileName, title="Export population", filetypes=(("CSV", "*.csv"), ("All files", "*.*")), defaultextension='.csv')
         if self.fileName:
             return True
