@@ -14,6 +14,7 @@ from kivy.uix.popup import Popup
 from kivy.uix.screenmanager import SlideTransition
 
 import threading
+import multiprocessing
 import csv
 import sys
 import time
@@ -28,6 +29,11 @@ from snakeBody import Snake
 
 from Intelligence.generation import Generation
 
+from Processes.generationProcess import GenProcess
+
+from Processes.graphProcess import GraphProcess
+
+from Processes.simulateProcess import SimulateProcess
 
 class ImageButton(ButtonBehavior, Image):  
     def on_press(self):
@@ -132,102 +138,116 @@ class AiScreen(GridLayout):
         self.add_widget(trainingInfoGrid)
 
 ############################## SHOW GRAPHS ###########################################################################
-        graphsLine = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40)
+        btn1Line = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=40)
         graphsBut = Button(text="Show graphs", size_hint_x=None, width=150)
         graphsBut.bind(on_press=self.openGraphs)
-        graphsLine.add_widget(Label())
-        graphsLine.add_widget(graphsBut)
-        graphsLine.add_widget(Label())
-        self.add_widget(graphsLine)
+        simulateBut = Button(text="Run actual snake", size_hint_x=None, width=150)
+        simulateBut.bind(on_press=self.simulateSnake)
+        btn1Line.add_widget(Label())
+        btn1Line.add_widget(graphsBut)
+        btn1Line.add_widget(Label())
+        btn1Line.add_widget(simulateBut)
+        btn1Line.add_widget(Label())
+        self.add_widget(btn1Line)
 
 
     def openGraphs(self, instance):
         if self.generate == 0:
-            self.popupGraphsShow()
+            self.popupShow(True)
         else:
             openG = threading.Thread(target=self.openGraphsThr)
             openG.start()
 
-    def openGraphsThr(self):
-        from subprocess import Popen
-        if globalVars.executable:
-            Popen(['graphs.exe', str(self.graphName), '1'])
+    def simulateSnake(self, instance):
+        if self.generate == 0:
+            self.popupShow(False)
         else:
-            Popen(['python', 'graphs.py', str(self.graphName), '1'])
+            openG = threading.Thread(target=self.simulateSnakeThr)
+            openG.start()
 
-    def writeDataGraphs(self, score, gen, fit, sec):
-        with open(self.graphName, 'a') as f:
-            f.write(str(score) + ',' + str(gen) + ',' + str(fit) + ',' + str(sec) + ",\n")
+    def openGraphsThr(self):
+        dataIn = multiprocessing.JoinableQueue()
+        results = multiprocessing.Queue()
+        proces = GraphProcess(dataIn, results)
+        proces.start()
+        dataIn.put([self.graphName, 1])
+
+    def simulateSnakeThr(self):
+        dataIn = multiprocessing.JoinableQueue()
+        results = multiprocessing.Queue()
+        proces = SimulateProcess(dataIn, results)
+        proces.start()
+        dataIn.put([globalVars.fieldSize, 50, self.fileName, int(self.actualSnaleLabel.text)])
 
     def generateSnakesButton(self, instance):
+        if os.path.exists(self.graphName):
+            os.remove(self.graphName)
+            
         self.noOfNeuron1Layer = int(self.neuron1LayerTI.text)
         self.noOfNeuron2Layer = int(self.neuron2LayerTI.text)
 
         if self.createDataCsv():
             self.stopSnakeBut.background_color = [1, 0.3, 0.3, 1]
-            self.generateThreadHandle = threading.Thread(target=self.generateThread, daemon=True)
-            self.generateThreadHandle.start()
 
+            self.generateProcessHandle = threading.Thread(target=self.generateProcessThread, daemon=True)
+            self.generateProcessHandle.start()
 
-    def generateThread(self):
-        self.noOfSnakes = int(self.noOfSnakesTI.text)
+    def generateProcessThread(self):
+        dataIn = multiprocessing.JoinableQueue()
+        results = multiprocessing.Queue()
+        multiprocessing.freeze_support()        
+        gen = GenProcess(dataIn, results)
+        #gen.daemon = True
+        gen.start()
+
+        dataIn.put([self.noOfSnakes, float(self.selectionRateTI.text), float(self.mutationRateTI.text), self.noOfNeuron1Layer, self.noOfNeuron2Layer, self.fileName, self.fileDateTime, globalVars.fieldSize])
+        result = results.get()
 
         self.generate = True
-
-        bestSnakes = []
-        self.bestScore = []
-        self.bestFitness = []
-
-        counterGen = 0
-        startTime = 0
-
         while self.generate:
-            if counterGen == 0:
-                generation = Generation(noOfSnakes=int(self.noOfSnakes*10),
-                                        selectionRate=float(self.selectionRateTI.text)/10,
-                                        noNeuron1Layer=self.noOfNeuron1Layer,
-                                        noNeuron2Layer=self.noOfNeuron2Layer)
-                startTime = time.time()
-                generation.live()
-                bestSnakes = generation.exportBest()
-                score, fitness = generation.bestScoreFitness()
-                noOfInputs, noOfNeuron1Layer, noOfNeuron2Layer = bestSnakes[0].exportDimBrain()
-                self.saveDataCsv(noOfInputs=noOfInputs, noOfNeuron1Layer=noOfNeuron1Layer, noOfNeuron2Layer=noOfNeuron2Layer)
-                self.saveWeightsCsv(generation.bestWeights())
-                actualTime = time.time() - startTime
-                self.writeDataGraphs(score, counterGen, fitness, actualTime)
-                self.openGraphs(0)
-                del generation
-            else:
-                generation = Generation(noOfSnakes=self.noOfSnakes,
-                                        selectionRate=float(self.selectionRateTI.text),
-                                        noNeuron1Layer=self.noOfNeuron1Layer,
-                                        noNeuron2Layer=self.noOfNeuron2Layer,
-                                        mutationRate=float(self.mutationRateTI.text))
-                generation.live(parents=bestSnakes)
-                bestSnakes = generation.exportBest()
-                score, fitness = generation.bestScoreFitness()
-                self.saveWeightsCsv(generation.bestWeights())
-                actualTime = time.time() - startTime
-                self.writeDataGraphs(score, counterGen, fitness, actualTime)
-                del generation
+            dataIn.put(1)
+            result = results.get()           
+            self.actualSnaleLabel.text = str(result[0])
+            self.scorelSnaleLabel.text = str(result[1])
+            self.fitnesslSnaleLabel.text = str(result[2])
 
-            self.bestScore.append(score)
-            self.bestFitness.append(fitness)
+        dataIn.put(0)
 
-            self.actualSnaleLabel.text = str(counterGen)
-            self.scorelSnaleLabel.text = str(score)
-            self.fitnesslSnaleLabel.text = str(fitness)
-            counterGen += 1
+    def buttonProcess(self):
+        from testProcess import Proc
+        dataIn = multiprocessing.JoinableQueue()
+        results = multiprocessing.Queue()
+        proces = Proc(dataIn, results)
+        proces.daemon = True
+        print("main - startujeme process")
+        proces.start()
+
+        for i in range(3):
+            dataIn.put(i+1)
+            result = results.get() 
+            print("main result " + str(result))
+            self.actualSnaleLabel.text = str(result[0])
+            self.scorelSnaleLabel.text = str(result[1])
+            self.fitnesslSnaleLabel.text = str(result[2])
+
+        dataIn.put(0)
+        result = results.get() 
+        self.actualSnaleLabel.text = str(result[0])
+        self.scorelSnaleLabel.text = str(result[1])
+        self.fitnesslSnaleLabel.text = str(result[2])
+
 
     def stopSnakeButton(self, instance):
+        stopGenerateHandle = threading.Thread(target=self.stopGenerateThread, daemon=True)
+        stopGenerateHandle.start()
+
+    def stopGenerateThread(self):
         if self.generate == True:
-            self.stopSnakeBut.background_color = [1, 0, 0, 0.5]       
+            self.stopSnakeBut.text = "Stopping"
             self.generate = False
-            self.generateThreadHandle.join()
-            self.saveBestScoreCsv()
-            if os.path.exists(self.graphName):
-                os.remove(self.graphName)
+            self.generateProcessHandle.join()
+            self.stopSnakeBut.background_color = [1, 0, 0, 0.5] 
+            self.stopSnakeBut.text = "Stop generating"
 
     def createDataCsv(self):
         now = datetime.now()
@@ -239,58 +259,21 @@ class AiScreen(GridLayout):
         else:
             return False
 
-    def saveDataCsv(self, noOfInputs, noOfNeuron1Layer, noOfNeuron2Layer):
-        with open(self.fileName, 'w', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["dateTime", self.fileDateTime])
-            writer.writerow(["noOfSnakes", self.noOfSnakesTI.text])
-            writer.writerow(["selectionRate", self.selectionRateTI.text])
-            writer.writerow(["mutationRate", self.mutationRateTI.text])
-            writer.writerow(["noOfInputs", noOfInputs])
-            writer.writerow(["noOfNeuron1Layer", noOfNeuron1Layer])
-            writer.writerow(["noOfNeuron2Layer", noOfNeuron2Layer])
 
-    def saveWeightsCsv(self, weights):
-        with open(self.fileName, 'a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["weights", weights])
-
-    def saveBestScoreCsv(self):
-        with open(self.graphName, "r") as file:
-            self.score = []
-            self.generation = []
-            self.fitness = []
-            self.seconds = []
-            for line in file:
-                data = list(line.split(","))
-                score = int(data[0])
-                generation = int(data[1])
-                fitness = int(data[2])
-                seconds = float(data[3])
-
-                self.score.append(score)
-                self.generation.append(generation)
-                self.fitness.append(fitness)
-                self.seconds.append(seconds)
-
-        with open(self.fileName, 'a', newline='') as file:
-            writer = csv.writer(file)
-            writer.writerow(["score", self.score])
-            writer.writerow(["generation", self.generation])
-            writer.writerow(["fitness", self.fitness])
-            writer.writerow(["seconds", self.seconds])
-
-
-    def popupGraphsShow(self):
+    def popupShow(self, info):
         layout = GridLayout(cols = 1, padding = 10) 
-        popupLabel1 = Label(text = "Training has not started") 
-        popupLabel2 = Label(text = "NO graphs for training available") 
+        popupLabel1 = Label(text = "Training has not started")
+        if info == True:
+            popupLabel2 = Label(text = "NO graphs for training available")
+        else:
+            popupLabel2 = Label(text = "NO simulations for training available")
+
         layout.add_widget(popupLabel1) 
         layout.add_widget(popupLabel2) 
         popup = Popup(title ='INFO', 
                         content = layout, 
                         size_hint =(None, None), size =(300, 150))   
-        popup.open()     
+        popup.open()
 
     def __del__(self):
         if os.path.exists(self.graphName):

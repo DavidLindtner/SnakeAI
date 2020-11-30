@@ -1,8 +1,11 @@
+import multiprocessing
+
 from math import sin
 from random import randint
 import time
 import sys
 import csv
+import os
 
 import kivy
 from kivy.app import App
@@ -13,13 +16,32 @@ from kivy.uix.label import Label
 from kivy_garden.graph import Graph, LinePlot
 from kivy.clock import Clock
 
+from kivy.core.window import Window
+
+class GraphProcess(multiprocessing.Process):
+    
+    def __init__(self, task_queue, result_queue):
+        
+        multiprocessing.Process.__init__(self)
+        self.task_queue = task_queue
+        self.result_queue = result_queue
+
+    def run(self):
+        global dataFile
+        global refreshRate
+        dataFile, refreshRate = self.task_queue.get()
+        GraphView().run()
+
+
 class graphicsScreen(GridLayout):
     def __init__(self, **kwargs):
         super(graphicsScreen, self).__init__(**kwargs)
 
-        self.dataFile = sys.argv[1]
-        self.refreshRate = int(sys.argv[2])
-
+        global dataFile
+        self.dataFile = dataFile
+        global refreshRate
+        self.refreshRate = refreshRate
+        Window.size = (800, 600)
         self.cols = 2
         self.rows = 2
 
@@ -105,15 +127,13 @@ class graphicsScreen(GridLayout):
         self.genTimePlot.points = [(0,0)]
         self.graphGenTime.add_plot(self.genTimePlot)
 
-
-        
         self.add_widget(self.graphScore)
         self.add_widget(self.graphFitness)
         self.add_widget(self.graphScoreTime)
         self.add_widget(self.graphGenTime)
 
         if self.refreshRate > 0:
-            Clock.schedule_interval(self.readPipeData, self.refreshRate)
+            self.readHandle = Clock.schedule_interval(self.readPipeData, self.refreshRate)
         else:
             self.readCsvData()
 
@@ -152,20 +172,24 @@ class graphicsScreen(GridLayout):
         self.fitnessPoints = []
         self.scoreTimePoints = []
         self.timeGenPoints = []
-        with open(self.dataFile, "r") as file:
-            for line in file:
-                data = list(line.split(","))
-                score = int(data[0])
-                generation = int(data[1])
-                fitness = int(data[2])
-                minutes = float(data[3])/60
+        if os.path.exists(self.dataFile):
+            with open(self.dataFile, "r") as file:
+                for line in file:
+                    data = list(line.split(","))
+                    score = int(data[0])
+                    generation = int(data[1])
+                    fitness = int(data[2])
+                    minutes = float(data[3])/60
 
-                self.scorePoints.append((generation, score))
-                self.fitnessPoints.append((generation, fitness))
-                self.scoreTimePoints.append((minutes, score))
-                self.timeGenPoints.append((generation, minutes))
+                    self.scorePoints.append((generation, score))
+                    self.fitnessPoints.append((generation, fitness))
+                    self.scoreTimePoints.append((minutes, score))
+                    self.timeGenPoints.append((generation, minutes))
 
-        self.graphsUpdate()
+            self.graphsUpdate()
+        else:
+            self.readHandle.cancel()
+
 
     def graphsUpdate(self):
         self.scorePlot.points = self.scorePoints
@@ -206,7 +230,7 @@ class graphicsScreen(GridLayout):
         yListGenTime = []
         for point in self.genTimePlot.points:
             yListGenTime.append(point[1])
-        ymax = round(max(yListGenTime), 1) + 0.1
+        ymax = round(max(yListGenTime), 1)
         self.graphGenTime.ymax = 1 if ymax < 1 else ymax
         
 
@@ -220,12 +244,9 @@ class graphicsScreen(GridLayout):
         self.graphScoreTime.y_ticks_major = int(self.graphScoreTime.ymax/10)
         self.graphGenTime.y_ticks_major = float(self.graphGenTime.ymax/10)
 
-class GraphProcess(App):
+class GraphView(App):
     def build(self):
         self.icon = 'Icons/snake.png'
         return graphicsScreen()
-
-if __name__ == '__main__':
-    GraphProcess().run()
 
 

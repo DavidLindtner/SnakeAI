@@ -1,3 +1,4 @@
+import multiprocessing
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.label import Label
@@ -11,10 +12,24 @@ import csv
 import sys
 
 from Globals import globalFcns
-from Globals import globalVars
 
 from snakeBody import Snake
 
+class SimulateProcess(multiprocessing.Process):
+    
+    def __init__(self, task_queue, result_queue):
+        
+        multiprocessing.Process.__init__(self)
+        self.task_queue = task_queue
+        self.result_queue = result_queue
+
+    def run(self):
+        global fieldSize
+        global snakeSpeed
+        global fileName
+        global indexWeight
+        fieldSize, snakeSpeed, fileName, indexWeight = self.task_queue.get()
+        SimulateSnake().run()
 
 
 Builder.load_string("""
@@ -37,12 +52,17 @@ class SimulateScreen(GridLayout):
     def __init__(self, **kwargs):
         super(SimulateScreen, self).__init__(**kwargs)
 
-        Window.size = (400, 600)
+        Window.size = (400, 650)
 
-        self.fieldSize = int(sys.argv[1])+2
-        self.snakeSpeed = float(sys.argv[2])
-        self.fileName = sys.argv[3]
-        self.indexWeight = int(sys.argv[4])
+        global fieldSize
+        global snakeSpeed
+        global fileName
+        global indexWeight
+
+        self.fieldSize = fieldSize
+        self.snakeSpeed = snakeSpeed
+        self.fileName = fileName
+        self.indexWeight = indexWeight
 
         self.readWeightCsv(self.fileName)
 
@@ -65,8 +85,8 @@ class SimulateScreen(GridLayout):
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
-        self.add_widget(Label())
-        self.add_widget(Label())
+        #self.add_widget(Label())
+        #self.add_widget(Label())
 
         againLine = GridLayout(cols=3, row_force_default=True, row_default_height=40)
         againBut = Button(text='Again', size_hint_x=None, width=150)
@@ -106,9 +126,6 @@ class SimulateScreen(GridLayout):
         foodLine.add_widget(Label())
 
         self.add_widget(foodLine)
-
-
-        
 
         self.snake = Snake(intelligence=True,fieldSize=self.fieldSize-2)
         self.snake.importBrain(rates=self.weights[self.indexWeight].copy(),  noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
@@ -161,7 +178,3 @@ class SimulateSnake(App):
     def build(self):
         self.icon = 'Icons/snake.png'
         return SimulateScreen()
-
-
-if __name__ == '__main__':
-    SimulateSnake().run()

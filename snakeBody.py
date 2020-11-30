@@ -1,5 +1,5 @@
 from random import randint
-from kivy.core.window import Window
+#from kivy.core.window import Window
 import numpy as np
 
 from Globals import globalVars
@@ -24,12 +24,10 @@ class Snake():
 
         self.field = [0] * self.fieldSize * self.fieldSize
 
-        #if self.fieldSize % 2 == 0:
-        #    self.parts = [int(self.fieldSize*self.fieldSize/2 - self.fieldSize/2 - 1)]
-        #else:
-        #    self.parts = [int(self.fieldSize*self.fieldSize/2 - 1)]
-
         self.last = 0
+        self.headLastMove = 0
+        self.headsecondLastMove = 0
+        self.stuckSnake = 0
         self.moveX = 0
         self.moveY = 0
         self.score = 1
@@ -86,10 +84,8 @@ class Snake():
             self.calculateFitness()
             return False
 
-        
         self.snakeMove()
         self.calculateFitness()
-        
 
         #   hit snake
         if self.field[self.parts[0]] == 1:
@@ -118,6 +114,18 @@ class Snake():
         if len(self.parts) >= 2:
             self.field[self.parts[1]] = 1
 
+        #   stucked snake
+        if Xdir != 0 or Ydir != 0 or self.intelligence == True:
+            if self.headsecondLastMove == self.parts[0]:
+                self.stuckSnake += 1
+            else:
+                self.stuckSnake = 0
+            if self.stuckSnake > 10:
+                self.field[self.parts[0]] = 5
+                return False
+
+        self.headsecondLastMove = self.headLastMove
+        self.headLastMove = self.parts[0]
         #self.countVision()
         return True
 

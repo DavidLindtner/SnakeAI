@@ -1,3 +1,5 @@
+import multiprocessing
+
 import kivy
 from kivy.app import App
 from kivy.uix.gridlayout import GridLayout
@@ -21,6 +23,8 @@ import csv
 
 from Globals import globalVars
 
+from Processes.graphProcess import GraphProcess
+from Processes.simulateProcess import SimulateProcess
 
 class ImageButton(ButtonBehavior, Image):  
     def on_press(self):
@@ -183,14 +187,14 @@ class AiResultScreen(GridLayout):
             simS.start()
 
     def simSnakeThr(self):
-        fieldSize = str(int(self.fieldSizeTI.text))
-        snakeSpeed = str(float(self.snakeSpeedTI.text))
-        from subprocess import Popen
-        if globalVars.executable:
-            Popen(['simulateSnake.exe', fieldSize, snakeSpeed, self.fileName, str(self.weightSimulate)])
-        else:
-            Popen(['python', 'simulateSnake.py', fieldSize, snakeSpeed, self.fileName, str(self.weightSimulate)])
+        fieldSize = int(self.fieldSizeTI.text)
+        snakeSpeed = float(self.snakeSpeedTI.text)
 
+        dataIn = multiprocessing.JoinableQueue()
+        results = multiprocessing.Queue()
+        proces = SimulateProcess(dataIn, results)
+        proces.start()
+        dataIn.put([fieldSize, snakeSpeed, self.fileName, self.weightSimulate])
 
     def importButton(self, instance):
         self.fileName = filedialog.askopenfilename(initialdir="/", title="Import population", filetypes=(("CSV", "*.csv"), ("All files", "*.*")))
@@ -207,12 +211,11 @@ class AiResultScreen(GridLayout):
             openG.start()
 
     def openGraphsThr(self):
-        from subprocess import Popen
-        if globalVars.executable:
-            Popen(['graphs.exe', str(self.fileName), '0'])
-        else:
-            Popen(['python', 'graphs.py', str(self.fileName), '0'])
-
+        dataIn = multiprocessing.JoinableQueue()
+        results = multiprocessing.Queue()
+        proces = GraphProcess(dataIn, results)
+        proces.start()
+        dataIn.put([self.fileName, 0])
 
     def importThread(self):
         self.readStatCsv(self.fileName)

@@ -14,7 +14,6 @@ def init():
     global buttonPressed
     global snakeSpeekSimulate
     global icon
-    global executable
 
     screenManager = ScreenManager()
     fieldSize = 12
@@ -23,7 +22,6 @@ def init():
     snakeSpeekSimulate = 4
     buttonPressed = ButtonPressed()
     icon = 'snake.png'
-    executable = False
 
 
 

@@ -1,14 +1,18 @@
-#   pyinstaller snake.py --onefile --noconsole --icon Icons\snake.ico
-#   pyinstaller graphs.py --onefile --noconsole
-#   pyinstaller simulateSnake.py --onefile --noconsole
+#   pyinstaller snake.py --onedir --noconsole --icon Icons\snake.ico
+#   pyinstaller snake.py --onedir --icon Icons\snake.ico
+
+import multiprocessing
+if __name__ == '__main__':
+    multiprocessing.freeze_support()
+
+import tkinter as tk
 
 import kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.core.window import Window
 from kivy.config import Config 
-
-import tkinter as tk
+Config.set('graphics', 'width', '400')
+Config.set('graphics', 'height', '650')
 
 from Globals import globalVars
 
@@ -47,8 +51,6 @@ class SnakeAI(App):
         self.screenAiRes = Screen(name="AiRes")
         self.screenAiRes.add_widget(self.aiScreenRes)
         globalVars.screenManager.add_widget(self.screenAiRes)
-
-        Window.size = (400, 650)
 
         return globalVars.screenManager
 

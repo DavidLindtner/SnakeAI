@@ -1,4 +1,3 @@
-
 import threading
 
 from Globals import globalVars
@@ -28,7 +27,7 @@ class Generation():
                 self.snakes[i].randomBrain(noOfNeuron1 = self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
         else:
             cross = Crossover(inSnakes=parents.copy(), noOfOutSnakes=self.noOfSnakes, mutationRate=self.mutationRate, noNeuron1Layer=self.noOfNeuron1Layer, noNeuron2Layer=self.noOfNeuron2Layer)
-            self.snakes = cross.simpleCrossover()
+            self.snakes = cross.onePointCrossover()
             del cross
 
 

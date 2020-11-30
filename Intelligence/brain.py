@@ -26,13 +26,13 @@ class Brain():
 
     def randomWeights(self):
         strength = 0.2
-        self.weights1 = (2 * np.random.random((self.noOfNeuron1Layer, self.noOfInputs)) - 1) * strength
-        self.weights2 = (2 * np.random.random((self.noOfNeuron2Layer, self.noOfNeuron1Layer)) - 1) *strength
-        self.weights3 = (2 * np.random.random((self.noOfOutputs, self.noOfNeuron2Layer)) - 1) * strength
+        self.weights1 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron1Layer, self.noOfInputs))
+        self.weights2 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron2Layer, self.noOfNeuron1Layer))
+        self.weights3 = np.random.normal(loc=0, scale=strength, size=(self.noOfOutputs, self.noOfNeuron2Layer))
 
-        self.bias1 = (2 * np.random.random((self.noOfInputs, 1)) - 1) * strength
-        self.bias2 = (2 * np.random.random((self.noOfNeuron1Layer, 1)) - 1) * strength
-        self.bias3 = (2 * np.random.random((self.noOfNeuron2Layer, 1)) - 1) * strength
+        self.bias1 = np.random.normal(loc=0, scale=strength, size=(self.noOfInputs, 1))
+        self.bias2 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron1Layer, 1))
+        self.bias3 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron2Layer, 1))
 
         #print(self.weights1)
         #print(self.bias1)
