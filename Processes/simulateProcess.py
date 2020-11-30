@@ -52,7 +52,7 @@ class SimulateScreen(GridLayout):
     def __init__(self, **kwargs):
         super(SimulateScreen, self).__init__(**kwargs)
 
-        Window.size = (400, 650)
+        Window.size = (450, 750)
 
         global fieldSize
         global snakeSpeed
@@ -85,11 +85,9 @@ class SimulateScreen(GridLayout):
         self.add_widget(Label())
         self.add_widget(Label())
         self.add_widget(Label())
-        #self.add_widget(Label())
-        #self.add_widget(Label())
 
         againLine = GridLayout(cols=3, row_force_default=True, row_default_height=40)
-        againBut = Button(text='Again', size_hint_x=None, width=150)
+        againBut = Button(text='Again', size_hint_x=None, width=200, font_size='20sp',)
         againBut.bind(on_press=self.againButton)
         againLine.add_widget(Label())
         againLine.add_widget(againBut)
@@ -99,14 +97,14 @@ class SimulateScreen(GridLayout):
 ############################## SCORE MOVES ################################################
         scoreLine = GridLayout(cols=7, rows=1, row_force_default=True, row_default_height=40)
 
-        self.scoreLabel = Label(text='1', size_hint_x=None, width=50)
-        self.movesLabel = Label(text='0', size_hint_x=None, width=50)
+        self.scoreLabel = Label(text='1', size_hint_x=None, width=50, font_size='20sp')
+        self.movesLabel = Label(text='0', size_hint_x=None, width=50, font_size='20sp')
 
         scoreLine.add_widget(Label())
-        scoreLine.add_widget(Label(text='Score:', size_hint_x=None, width=100))
+        scoreLine.add_widget(Label(text='Score:', font_size='20sp', size_hint_x=None, width=100))
         scoreLine.add_widget(self.scoreLabel)
         scoreLine.add_widget(Label())
-        scoreLine.add_widget(Label(text='Moves:', size_hint_x=None, width=100))
+        scoreLine.add_widget(Label(text='Moves:', font_size='20sp', size_hint_x=None, width=100))
         scoreLine.add_widget(self.movesLabel)
         scoreLine.add_widget(Label())
 
@@ -114,14 +112,14 @@ class SimulateScreen(GridLayout):
 
 ############################## LABELS INFO ################################################
         foodLine = GridLayout(cols=7, rows=1, row_force_default=True, row_default_height=60)
-        self.movesWithoutFoodLabel = Label(text='0', size_hint_x=None, width=50)
-        self.foodMovesRatioLabel = Label(text='0', size_hint_x=None, width=50)
+        self.movesWithoutFoodLabel = Label(text='0', font_size='20sp', size_hint_x=None, width=50)
+        self.foodMovesRatioLabel = Label(text='0', font_size='20sp', size_hint_x=None, width=50)
 
         foodLine.add_widget(Label())
-        foodLine.add_widget(Label(text='      Moves \nwithout food:', size_hint_x=None, width=100))
+        foodLine.add_widget(Label(text='      Moves \nwithout food:', font_size='20sp', size_hint_x=None, width=100))
         foodLine.add_widget(self.movesWithoutFoodLabel)
         foodLine.add_widget(Label())
-        foodLine.add_widget(Label(text='Moves to\nfood ratio:', size_hint_x=None, width=100))
+        foodLine.add_widget(Label(text='Moves to\nfood ratio:', font_size='20sp', size_hint_x=None, width=100))
         foodLine.add_widget(self.foodMovesRatioLabel)
         foodLine.add_widget(Label())
 

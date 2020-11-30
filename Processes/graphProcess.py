@@ -50,6 +50,7 @@ class graphicsScreen(GridLayout):
         self.graphScore = Graph(
             xlabel='Generation',
             ylabel='Score',
+            font_size='20sp',
             x_ticks_major=1,
             y_ticks_major=1,
             y_grid_label=True,
@@ -70,6 +71,7 @@ class graphicsScreen(GridLayout):
         self.graphFitness = Graph(
             xlabel='Generation',
             ylabel='Fitness',
+            font_size='20sp',
             x_ticks_major=1,
             y_ticks_major=1,
             y_grid_label=True,
@@ -90,6 +92,7 @@ class graphicsScreen(GridLayout):
         self.graphScoreTime = Graph(
             xlabel='Time [min]',
             ylabel='Score',
+            font_size='20sp',
             x_ticks_major=1,
             y_ticks_major=1,
             y_grid_label=True,
@@ -111,6 +114,7 @@ class graphicsScreen(GridLayout):
         self.graphGenTime = Graph(
             xlabel='Generation',
             ylabel='Time [min]',
+            font_size='20sp',
             x_ticks_major=1,
             y_ticks_major=1,
             y_grid_label=True,

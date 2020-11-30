@@ -64,48 +64,48 @@ class AiScreen(GridLayout):
 ############################## BACK TITLE ###########################################################################
         topLine = BoxLayout(orientation='horizontal', spacing=10)
         topLine.add_widget(Label(text='', size_hint=(0.15, 1)))
-        topLine.add_widget(Label(text='SNAKE AI', size_hint=(.7, 1)))
+        topLine.add_widget(Label(text='AI SETUP', size_hint=(.7, 1), font_size='30sp'))
         topLine.add_widget(ImageButton(source='Icons/front.png', size_hint=(.1, 1)))
         topLine.add_widget(Label(text='', size_hint=(0.05, 1)))
         self.add_widget(topLine)
 
 ############################## NUMBER OF SNAKES ###########################################################################
-        numSnakeLine = GridLayout(cols=2, row_force_default=True, row_default_height=30)
-        numSnakeLine.add_widget(Label(text='Number of snake\nin 1 generation', size_hint_x=None, width=200))
-        self.noOfSnakesTI = TextInput(multiline=False, text=str(self.noOfSnakes), size_hint_x=None, width=50)
+        numSnakeLine = GridLayout(cols=2, row_force_default=True, row_default_height=40)
+        numSnakeLine.add_widget(Label(text='Number of snakes\n   in 1 generation', size_hint_x=None, width=250, font_size='20sp'))
+        self.noOfSnakesTI = TextInput(multiline=False, text=str(self.noOfSnakes), size_hint_x=None, width=50, font_size='20sp')
         numSnakeLine.add_widget(self.noOfSnakesTI)
 
         self.add_widget(numSnakeLine)
 
 ############################## SELECTION RATE ###########################################################################
-        num1SnakeLine = GridLayout(cols=4, row_force_default=True, row_default_height=30)
-        num1SnakeLine.add_widget(Label(text='Selection rate', size_hint_x=None, width=150))
-        self.selectionRateTI = TextInput(multiline=False, text=str(0.1), size_hint_x=None, width=40)
+        num1SnakeLine = GridLayout(cols=4, row_force_default=True, row_default_height=40)
+        num1SnakeLine.add_widget(Label(text='Selection rate', size_hint_x=None, width=150, font_size='20sp'))
+        self.selectionRateTI = TextInput(multiline=False, text=str(0.1), size_hint_x=None, width=50, font_size='20sp')
         num1SnakeLine.add_widget(self.selectionRateTI)
 
-        num1SnakeLine.add_widget(Label(text='Mutation rate', size_hint_x=None, width=150))
-        self.mutationRateTI = TextInput(multiline=False, text=str(0.05), size_hint_x=None, width=40)
+        num1SnakeLine.add_widget(Label(text='Mutation rate', size_hint_x=None, width=150, font_size='20sp'))
+        self.mutationRateTI = TextInput(multiline=False, text=str(0.05), size_hint_x=None, width=50, font_size='20sp')
         num1SnakeLine.add_widget(self.mutationRateTI)
 
         self.add_widget(num1SnakeLine)
 
 ############################## MUTATION RATE ###########################################################################
-        netSnakeLine = GridLayout(cols=4, row_force_default=True, row_default_height=30)
-        netSnakeLine.add_widget(Label(text='Neurons in\n   1. layer', size_hint_x=None, width=150))
-        self.neuron1LayerTI = TextInput(multiline=False, text=str(self.noOfNeuron1Layer), size_hint_x=None, width=40)
+        netSnakeLine = GridLayout(cols=4, row_force_default=True, row_default_height=40)
+        netSnakeLine.add_widget(Label(text='Neurons in\n   1. layer', size_hint_x=None, width=150, font_size='20sp'))
+        self.neuron1LayerTI = TextInput(multiline=False, text=str(self.noOfNeuron1Layer), size_hint_x=None, width=50, font_size='20sp')
         netSnakeLine.add_widget(self.neuron1LayerTI)
 
-        netSnakeLine.add_widget(Label(text='Neurons in\n   2. layer', size_hint_x=None, width=150))
-        self.neuron2LayerTI = TextInput(multiline=False, text=str(self.noOfNeuron2Layer), size_hint_x=None, width=40)
+        netSnakeLine.add_widget(Label(text='Neurons in\n   2. layer', size_hint_x=None, width=150, font_size='20sp'))
+        self.neuron2LayerTI = TextInput(multiline=False, text=str(self.noOfNeuron2Layer), size_hint_x=None, width=40, font_size='20sp')
         netSnakeLine.add_widget(self.neuron2LayerTI)
 
         self.add_widget(netSnakeLine)
 
 ############################## BUTTONS ###########################################################################
-        btn2Line = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=40)
-        generateSnakesButton = Button(text="Generate Snakes", size_hint_x=None, width=150)
+        btn2Line = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=50)
+        generateSnakesButton = Button(text="Generate Snakes", size_hint_x=None, width=200, font_size='20sp')
         generateSnakesButton.bind(on_press=self.generateSnakesButton)
-        self.stopSnakeBut = Button(text="Stop generating", size_hint_x=None, width=150, background_color =(1, 0, 0, 0.5))
+        self.stopSnakeBut = Button(text="Stop generating", size_hint_x=None, width=200, background_color =(1, 0, 0, 0.5), font_size='20sp')
         self.stopSnakeBut.bind(on_press=self.stopSnakeButton)
         btn2Line.add_widget(Label())
         btn2Line.add_widget(generateSnakesButton)
@@ -115,33 +115,33 @@ class AiScreen(GridLayout):
         self.add_widget(btn2Line)
 
 ############################## ACTUAL GENERATION ###########################################################################
-        trainingInfoGrid = GridLayout(cols=1,row_force_default=True, row_default_height=30)
+        trainingInfoGrid = GridLayout(cols=1,row_force_default=True, row_default_height=40)
 
         actualSnakeLine = GridLayout(cols=2, row_force_default=True, row_default_height=30)
-        actualSnakeLine.add_widget(Label(text='Actual generation', size_hint_x=None, width=200))
-        self.actualSnaleLabel = Label(text="0", size_hint_x=None, width=50)
+        actualSnakeLine.add_widget(Label(text='Actual generation', size_hint_x=None, width=250, font_size='20sp'))
+        self.actualSnaleLabel = Label(text="0", size_hint_x=None, width=50, font_size='20sp')
         actualSnakeLine.add_widget(self.actualSnaleLabel)
 
         trainingInfoGrid.add_widget(actualSnakeLine)
 
 ############################## SCORE FITNESS ###########################################################################
-        scoreSnakeLine = GridLayout(cols=5, row_force_default=True, row_default_height=30)
-        scoreSnakeLine.add_widget(Label(text='Best fitness:', size_hint_x=None, width=100))
-        self.fitnesslSnaleLabel = Label(text="0", size_hint_x=None, width=60)
+        scoreSnakeLine = GridLayout(cols=5, row_force_default=True, row_default_height=40)
+        scoreSnakeLine.add_widget(Label(text='Best fitness:', size_hint_x=None, width=150, font_size='20sp'))
+        self.fitnesslSnaleLabel = Label(text="0", size_hint_x=None, width=60, font_size='20sp')
         scoreSnakeLine.add_widget(self.fitnesslSnaleLabel)
-        scoreSnakeLine.add_widget(Label(text=''))
-        scoreSnakeLine.add_widget(Label(text='Best score:', size_hint_x=None, width=100))
-        self.scorelSnaleLabel = Label(text="0", size_hint_x=None, width=60)
+        scoreSnakeLine.add_widget(Label())
+        scoreSnakeLine.add_widget(Label(text='Best score:', size_hint_x=None, width=150, font_size='20sp'))
+        self.scorelSnaleLabel = Label(text="0", size_hint_x=None, width=60, font_size='20sp')
         scoreSnakeLine.add_widget(self.scorelSnaleLabel)
         trainingInfoGrid.add_widget(scoreSnakeLine)
 
         self.add_widget(trainingInfoGrid)
 
 ############################## SHOW GRAPHS ###########################################################################
-        btn1Line = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=40)
-        graphsBut = Button(text="Show graphs", size_hint_x=None, width=150)
+        btn1Line = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=50)
+        graphsBut = Button(text="Show graphs", size_hint_x=None, width=200, font_size='20sp')
         graphsBut.bind(on_press=self.openGraphs)
-        simulateBut = Button(text="Run actual snake", size_hint_x=None, width=150)
+        simulateBut = Button(text="Run actual snake", size_hint_x=None, width=200, font_size='20sp')
         simulateBut.bind(on_press=self.simulateSnake)
         btn1Line.add_widget(Label())
         btn1Line.add_widget(graphsBut)
@@ -253,7 +253,8 @@ class AiScreen(GridLayout):
         now = datetime.now()
         self.fileDateTime = now.strftime("%Y.%m.%d-%H:%M:%S")
         initFileName = now.strftime("Population-%Y-%m-%d--%H-%M-%S")
-        self.fileName = filedialog.asksaveasfilename(initialdir="/", initialfile=initFileName, title="Export population", filetypes=(("CSV", "*.csv"), ("All files", "*.*")), defaultextension='.csv')
+        self.fileName = filedialog.asksaveasfilename(initialdir=globalVars.initialDir, initialfile=initFileName, title="Export population", filetypes=(("CSV", "*.csv"), ("All files", "*.*")), defaultextension='.csv')
+        globalVars.initialDir = os.path.split(self.fileName)
         if self.fileName:
             return True
         else:

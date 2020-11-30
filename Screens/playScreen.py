@@ -111,14 +111,14 @@ class PlayScreen(GridLayout):
 
 ############################## LABELS INFO ################################################
         foodLine = GridLayout(cols=7, rows=1, row_force_default=True, row_default_height=60)
-        self.movesWithoutFoodLabel = Label(text='0', font_size='18sp', size_hint_x=None, width=50)
-        self.foodMovesRatioLabel = Label(text='0', font_size='18sp', size_hint_x=None, width=50)
+        self.movesWithoutFoodLabel = Label(text='0', font_size='20sp', size_hint_x=None, width=50)
+        self.foodMovesRatioLabel = Label(text='0', font_size='20sp', size_hint_x=None, width=50)
 
         foodLine.add_widget(Label())
-        foodLine.add_widget(Label(text='      Moves \nwithout food:', font_size='18sp', size_hint_x=None, width=100))
+        foodLine.add_widget(Label(text='      Moves \nwithout food:', font_size='20sp', size_hint_x=None, width=100))
         foodLine.add_widget(self.movesWithoutFoodLabel)
         foodLine.add_widget(Label())
-        foodLine.add_widget(Label(text='Moves to\nfood ratio:', font_size='18sp', size_hint_x=None, width=100))
+        foodLine.add_widget(Label(text='Moves to\nfood ratio:', font_size='20sp', size_hint_x=None, width=100))
         foodLine.add_widget(self.foodMovesRatioLabel)
         foodLine.add_widget(Label())
 
@@ -126,13 +126,13 @@ class PlayScreen(GridLayout):
 
 ############################## BUTTONS ################################################
         botLine = BoxLayout(orientation='horizontal', spacing=10)
-        playAgainBut = Button(text="Play again", size_hint=(0.4, 0.7))
+        playAgainBut = Button(text="Play again", size_hint=(0.4, 0.8), font_size='20sp')
         playAgainBut.bind(on_press=self.playAgainButton)
-        botLine.add_widget(Label(text='', size_hint=(0.05, 0.7)))
-        botLine.add_widget(ImageButton(source='Icons/down.png', size_hint=(.1, 0.7)))
-        botLine.add_widget(Label(text='', size_hint=(0.1, 0.7)))
+        botLine.add_widget(Label(size_hint=(0.05, 0.7)))
+        botLine.add_widget(ImageButton(source='Icons/down.png', size_hint=(0.1, 0.8)))
+        botLine.add_widget(Label(size_hint=(0.1, 0.7)))
         botLine.add_widget(playAgainBut)
-        botLine.add_widget(Label(text='', size_hint=(0.25, 0.7)))
+        botLine.add_widget(Label(size_hint=(0.25, 0.7)))
         self.add_widget(botLine)
 
         self.add_widget(Label())
@@ -172,7 +172,7 @@ class PlayScreen(GridLayout):
                 self.moveX = 0
                 self.moveY = 0
                 self.playBar.text = "YOU WIN"
-                self.playBar.font_size='20sp'
+                self.playBar.font_size='30sp'
             else:
                 self.screenCell = globalFcns.drawField(screenCell=self.screenCell, field=self.snake.field)
                 self.event.cancel()
@@ -180,7 +180,7 @@ class PlayScreen(GridLayout):
                 self.moveX = 0
                 self.moveY = 0
                 self.playBar.text = "GAME OVER"
-                self.playBar.font_size='20sp'
+                self.playBar.font_size='30sp'
 
         self.scoreLabel.text = str(self.snake.score)
         self.movesLabel.text = str(self.snake.noOfMoves)
@@ -225,4 +225,4 @@ class PlayScreen(GridLayout):
     def newGameCount3(self, instance):
         self.event = Clock.schedule_interval(self.drawScreen, 1/globalVars.snakeSpeed)
         self.playBar.text = "PLAY"
-        self.playBar.font_size='20sp'
+        self.playBar.font_size='30sp'

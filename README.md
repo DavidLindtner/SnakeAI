@@ -1,5 +1,6 @@
 # SnakeAI
 
-python packages: kiwi
-
-Neural network is not implemented yet!
+python packages:
+* kiwi
+* kiwi garden - graphs
+* numpy

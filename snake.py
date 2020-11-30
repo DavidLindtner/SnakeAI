@@ -6,13 +6,15 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
 
 import tkinter as tk
+import ctypes
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 import kivy
 from kivy.app import App
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.config import Config 
-Config.set('graphics', 'width', '400')
-Config.set('graphics', 'height', '650')
+Config.set('graphics', 'width', '450')
+Config.set('graphics', 'height', '750')
 
 from Globals import globalVars
 

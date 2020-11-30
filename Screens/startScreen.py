@@ -16,30 +16,30 @@ class StartScreen(GridLayout):
         super(StartScreen, self).__init__(**kwargs)
 
         self.cols = 1
-        self.add_widget(Label(text='SNAKE AI'))
+        self.add_widget(Label(text='SNAKE AI', font_size='30sp'))
 
-        dimLine = GridLayout(cols=2, row_force_default=True, row_default_height=30)
-        dimLine.add_widget(Label(text='FIELD DIMENSIONS', size_hint_x=None, width=200))
+        dimLine = GridLayout(cols=2, row_force_default=True, row_default_height=40)
+        dimLine.add_widget(Label(text='FIELD DIMENSIONS', size_hint_x=None, width=300, font_size='20sp'))
 
-        self.fieldSizeTI = TextInput(multiline=False, text=str(globalVars.fieldSize-2), size_hint_x=None, width=50)
+        self.fieldSizeTI = TextInput(multiline=False, text=str(globalVars.fieldSize-2), size_hint_x=None, width=50, font_size='20sp')
         dimLine.add_widget(self.fieldSizeTI)
 
         self.add_widget(dimLine)
 
-        spdLine = GridLayout(cols=3, row_force_default=True, row_default_height=30)
+        spdLine = GridLayout(cols=3, row_force_default=True, row_default_height=40)
 
-        spdLine.add_widget(Label(text='SPEED', size_hint_x=None, width=150))
-        self.snakeSpeedTI = TextInput(multiline=False, text=str(globalVars.snakeSpeed), size_hint_x=None, width=50)
+        spdLine.add_widget(Label(text='SPEED', size_hint_x=None, width=200, font_size='20sp'))
+        self.snakeSpeedTI = TextInput(multiline=False, text=str(globalVars.snakeSpeed), size_hint_x=None, width=50, font_size='20sp')
         spdLine.add_widget(self.snakeSpeedTI)
-        spdLine.add_widget(Label(text='cell/s', size_hint_x=None, width=50))
+        spdLine.add_widget(Label(text='cell/s', size_hint_x=None, width=100, font_size='20sp'))
 
         self.add_widget(spdLine)
         
 
 
-        btn1Line = GridLayout(cols=3, row_force_default=True, row_default_height=40)
+        btn1Line = GridLayout(cols=3, row_force_default=True, row_default_height=50)
 
-        self.play = Button(text="Play", size_hint_x=None, width=150)
+        self.play = Button(text="Play", size_hint_x=None, width=200, font_size='20sp')
         btn1Line.add_widget(Label(text=""))
         btn1Line.add_widget(self.play)
         btn1Line.add_widget(Label(text=""))
@@ -48,15 +48,15 @@ class StartScreen(GridLayout):
         self.add_widget(btn1Line)
 
 
-        btn2Line = GridLayout(cols=5, row_force_default=True, row_default_height=40)
+        btn2Line = GridLayout(cols=5, row_force_default=True, row_default_height=50)
 
-        self.aiConf = Button(text="Setup AI", size_hint_x=None, width=150)
-        self.aiResult = Button(text="See results", size_hint_x=None, width=150)
-        btn2Line.add_widget(Label(text=""))
+        self.aiConf = Button(text="Setup AI", size_hint_x=None, width=200, font_size='20sp')
+        self.aiResult = Button(text="See results", size_hint_x=None, width=200, font_size='20sp')
+        btn2Line.add_widget(Label())
         btn2Line.add_widget(self.aiConf)
-        btn2Line.add_widget(Label(text=""))
+        btn2Line.add_widget(Label())
         btn2Line.add_widget(self.aiResult)
-        btn2Line.add_widget(Label(text=""))
+        btn2Line.add_widget(Label())
         self.aiConf.bind(on_press=self.aiConfButton)
         self.aiResult.bind(on_press=self.aiResButton)
 

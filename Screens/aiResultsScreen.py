@@ -20,10 +20,12 @@ import threading
 import tkinter as tk
 from tkinter import filedialog
 import csv
+import os
 
 from Globals import globalVars
 
 from Processes.graphProcess import GraphProcess
+
 from Processes.simulateProcess import SimulateProcess
 
 class ImageButton(ButtonBehavior, Image):  
@@ -49,15 +51,15 @@ class AiResultScreen(GridLayout):
         topLine = BoxLayout(orientation='horizontal', spacing=10)
         topLine.add_widget(Label(text='', size_hint=(0.05, 1)))
         topLine.add_widget(ImageButton(size_hint=(.1, 1)))
-        topLine.add_widget(Label(text='RESULT SCREEN', size_hint=(.7, 1)))
+        topLine.add_widget(Label(text='RESULT SCREEN', size_hint=(.7, 1), font_size='30sp'))
         topLine.add_widget(Label(text='', size_hint=(0.15, 1)))
         self.add_widget(topLine)
 
 ################################## IMPORT BUTTON #################################################################################
-        mainGrid = GridLayout(cols=1, row_force_default=True, row_default_height=30)
+        mainGrid = GridLayout(cols=1, row_force_default=True, row_default_height=40)
 
-        importLine = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=40)
-        importBut = Button(text="Import population", size_hint_x=None, width=150)
+        importLine = GridLayout(cols=3, rows=1, row_force_default=True, row_default_height=50)
+        importBut = Button(text="Import population", size_hint_x=None, width=250, font_size='20sp')
         importBut.bind(on_press=self.importButton)
         importLine.add_widget(Label())
         importLine.add_widget(importBut)
@@ -67,40 +69,42 @@ class AiResultScreen(GridLayout):
         mainGrid.add_widget(Label())
 
 ################################## INFO LABELS #################################################################################
-        infoGrid = GridLayout(cols=2, rows=8, row_force_default=True, row_default_height=15)
-        infoGrid.add_widget(Label(text='Date of training:'))
-        self.dateLabel = Label(text='')
+        infoGrid = GridLayout(cols=2, rows=8, row_force_default=True, row_default_height=20)
+        infoGrid.add_widget(Label(text='Date of training:', font_size='20sp'))
+        self.dateLabel = Label(font_size='20sp')
         infoGrid.add_widget(self.dateLabel)
 
         infoGrid.add_widget(Label())
         infoGrid.add_widget(Label())
 
-        snakeGrid = GridLayout(cols=3, row_force_default=True, row_default_height=30)
-        snakeGrid.add_widget(Label(size_hint_x=None, width=10))
-        snakeGrid.add_widget(Label(text='Total snakes:'))
-        self.allSnakesLabel = Label(text='')
-        snakeGrid.add_widget(self.allSnakesLabel)
-        infoGrid.add_widget(snakeGrid)
-
-        snakeGrid2 = GridLayout(cols=2, row_force_default=True, row_default_height=30)
-        snakeGrid2.add_widget(Label(text='Snakes in 1 gen.:'))
-        self.snakes1Label = Label(text='')
+        snakeGrid2 = GridLayout(cols=3, row_force_default=True, row_default_height=30)
+        snakeGrid2.add_widget(Label(size_hint_x=None, width=35))
+        snakeGrid2.add_widget(Label(text='Snakes in gen.:', font_size='20sp'))
+        self.snakes1Label = Label(font_size='20sp')
         snakeGrid2.add_widget(self.snakes1Label)
         infoGrid.add_widget(snakeGrid2)
+
+        snakeGrid = GridLayout(cols=3, row_force_default=True, row_default_height=30)
+        snakeGrid.add_widget(Label(size_hint_x=None, width=15))
+        snakeGrid.add_widget(Label(text='Total snakes:', font_size='20sp'))
+        self.allSnakesLabel = Label(font_size='20sp')
+        snakeGrid.add_widget(self.allSnakesLabel)
+        infoGrid.add_widget(snakeGrid)
 
         infoGrid.add_widget(Label())
         infoGrid.add_widget(Label())
 
         selGrid = GridLayout(cols=3, row_force_default=True, row_default_height=30)
-        selGrid.add_widget(Label(size_hint_x=None, width=10))
-        selGrid.add_widget(Label(text='Select. rate:'))
-        self.selectionLabel = Label(text='')
+        selGrid.add_widget(Label(size_hint_x=None, width=20))
+        selGrid.add_widget(Label(text='Select. rate:', font_size='20sp'))
+        self.selectionLabel = Label(font_size='20sp')
         selGrid.add_widget(self.selectionLabel)
         infoGrid.add_widget(selGrid)
 
-        mutGrid = GridLayout(cols=2, row_force_default=True, row_default_height=30)
-        mutGrid.add_widget(Label(text='Mutation rate:'))
-        self.mutationLabel = Label(text='')
+        mutGrid = GridLayout(cols=3, row_force_default=True, row_default_height=30)
+        mutGrid.add_widget(Label(size_hint_x=None, width=15))
+        mutGrid.add_widget(Label(text='Mutation rate:', font_size='20sp'))
+        self.mutationLabel = Label(font_size='20sp')
         mutGrid.add_widget(self.mutationLabel)
         infoGrid.add_widget(mutGrid)
 
@@ -110,15 +114,16 @@ class AiResultScreen(GridLayout):
         infoGrid.add_widget(Label())
 
         net1Grid = GridLayout(cols=3, row_force_default=True, row_default_height=25)
-        net1Grid.add_widget(Label(size_hint_x=None, width=10))
-        net1Grid.add_widget(Label(text='Neurons in\n   1. layer:'))
-        self.noNeuron1Label = Label(text='')
+        net1Grid.add_widget(Label(size_hint_x=None, width=20))
+        net1Grid.add_widget(Label(text='Neurons in\n   1. layer:', font_size='20sp'))
+        self.noNeuron1Label = Label(font_size='20sp')
         net1Grid.add_widget(self.noNeuron1Label)
         infoGrid.add_widget(net1Grid)
 
-        net2Grid = GridLayout(cols=2, row_force_default=True, row_default_height=25)
-        net2Grid.add_widget(Label(text='Neurons in\n   2. layer:'))
-        self.noNeuron2Label = Label(text='')
+        net2Grid = GridLayout(cols=3, row_force_default=True, row_default_height=25)
+        net2Grid.add_widget(Label(size_hint_x=None, width=15))
+        net2Grid.add_widget(Label(text='Neurons in\n   2. layer:', font_size='20sp'))
+        self.noNeuron2Label = Label(font_size='20sp')
         net2Grid.add_widget(self.noNeuron2Label)
         infoGrid.add_widget(net2Grid)
 
@@ -127,48 +132,49 @@ class AiResultScreen(GridLayout):
         self.add_widget(mainGrid)
 
         self.add_widget(Label())
+        self.add_widget(Label())
 
 ################################## SLIDER #################################################################################
         sliderLine = GridLayout(cols=1, rows=3, row_force_default=True, row_default_height=30)
 
-        sliderLine.add_widget(Label(text="Generations"))
+        sliderLine.add_widget(Label(text="Generations", font_size='20sp'))
 
         self.slider = Slider(min=0, max=0, value=25, orientation='horizontal', size_hint=(0.8, 1))
         self.slider.fbind('value', self.onChangeSliderValue)
         
         sliderUpLine = BoxLayout()
-        sliderUpLine.add_widget(Label(text='0', size_hint=(0.1, 1)))
+        sliderUpLine.add_widget(Label(text='0', size_hint=(0.1, 1), font_size='20sp'))
         sliderUpLine.add_widget(self.slider)
-        self.noOfWeightsLabel = Label(text='0', size_hint=(0.1, 1))
+        self.noOfWeightsLabel = Label(text='0', size_hint=(0.1, 1), font_size='20sp')
         sliderUpLine.add_widget(self.noOfWeightsLabel)
         sliderLine.add_widget(sliderUpLine)
 
-        self.actSliderValLabel = Label(text='0')
+        self.actSliderValLabel = Label(text='0', font_size='20sp')
         sliderLine.add_widget(self.actSliderValLabel)
         self.add_widget(sliderLine)
 
 ################################## FIELD DIMENSIONS SPEED #################################################################################
-        dimLine = GridLayout(cols=3, rows=2, row_force_default=True, row_default_height=30, spacing=3)
-        dimLine.add_widget(Label(text='Field dimensions', size_hint_x=None, width=200))
-        self.fieldSizeTI = TextInput(multiline=False, text=str(globalVars.fieldSize-2), size_hint_x=None, width=50)
+        dimLine = GridLayout(cols=3, rows=2, row_force_default=True, row_default_height=40, spacing=3)
+        dimLine.add_widget(Label(text='Field dimensions', size_hint_x=None, width=200, font_size='20sp'))
+        self.fieldSizeTI = TextInput(multiline=False, text=str(globalVars.fieldSize-2), size_hint_x=None, width=50, font_size='20sp')
         dimLine.add_widget(self.fieldSizeTI)
-        dimLine.add_widget(Label(text='cells', size_hint_x=None, width=50))
+        dimLine.add_widget(Label(text='cells', size_hint_x=None, width=70, font_size='20sp'))
 
-        dimLine.add_widget(Label(text='Speed', size_hint_x=None, width=200))
-        self.snakeSpeedTI = TextInput(multiline=False, text=str(100), size_hint_x=None, width=50)
+        dimLine.add_widget(Label(text='Speed', size_hint_x=None, width=200, font_size='20sp'))
+        self.snakeSpeedTI = TextInput(multiline=False, text=str(100), size_hint_x=None, width=50, font_size='20sp')
         dimLine.add_widget(self.snakeSpeedTI)
-        dimLine.add_widget(Label(text='cell/s', size_hint_x=None, width=50))
+        dimLine.add_widget(Label(text='cell/s', size_hint_x=None, width=70, font_size='20sp'))
         self.add_widget(dimLine)
 
 ################################## SIMULATE SNAKE, SHOW GRAPHS #################################################################################
-        btnSimLine = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=40)
-        simSnakeBut = Button(text="Simulate snake", size_hint_x=None, width=150)
+        btnSimLine = GridLayout(cols=5, rows=1, row_force_default=True, row_default_height=50)
+        simSnakeBut = Button(text="Simulate snake", size_hint_x=None, width=200, font_size='20sp')
         simSnakeBut.bind(on_press=self.simSnakeButton)
         btnSimLine.add_widget(Label())
         btnSimLine.add_widget(simSnakeBut)
         btnSimLine.add_widget(Label())
 
-        graphBut = Button(text="Show graphs", size_hint_x=None, width=150)
+        graphBut = Button(text="Show graphs", size_hint_x=None, width=200, font_size='20sp')
         graphBut.bind(on_press=self.openGraphs)
         btnSimLine.add_widget(graphBut)
         btnSimLine.add_widget(Label())
@@ -194,10 +200,11 @@ class AiResultScreen(GridLayout):
         results = multiprocessing.Queue()
         proces = SimulateProcess(dataIn, results)
         proces.start()
-        dataIn.put([fieldSize, snakeSpeed, self.fileName, self.weightSimulate])
+        dataIn.put([fieldSize+2, snakeSpeed, self.fileName, self.weightSimulate])
 
     def importButton(self, instance):
-        self.fileName = filedialog.askopenfilename(initialdir="/", title="Import population", filetypes=(("CSV", "*.csv"), ("All files", "*.*")))
+        self.fileName = filedialog.askopenfilename(initialdir=globalVars.initialDir, title="Import population", filetypes=(("CSV", "*.csv"), ("All files", "*.*")))
+        globalVars.initialDir = os.path.split(self.fileName)
         if self.fileName:
             importThrHandle = threading.Thread(target=self.importThread, daemon=True)
             importThrHandle.start()
