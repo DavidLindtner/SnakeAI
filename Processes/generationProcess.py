@@ -33,7 +33,8 @@ class GenProcess(multiprocessing.Process):
     def run(self):
         globalVars.init()
         Window.hide()
-        self.noOfSnakes, self.selectionRate, self.mutationRate, self.noOfNeuron1Layer, self.noOfNeuron2Layer, self.fileName, self.fileDateTime, globalVars.fieldSize = self.task_queue.get()
+        self.noOfSnakes, self.selectionRate, self.mutationRate, self.noOfNeuron1Layer, self.noOfNeuron2Layer, self.fileName, self.fileDateTime, fieldSize = self.task_queue.get()
+        globalVars.fieldSize = fieldSize
         self.task_queue.task_done()
         self.result_queue.put(1)
         generate = 1

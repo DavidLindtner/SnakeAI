@@ -6,6 +6,8 @@ import time
 import sys
 import csv
 import os
+import ctypes
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 import kivy
 from kivy.app import App
@@ -64,8 +66,11 @@ class graphicsScreen(GridLayout):
             xmin=0)
 
         self.scorePlot = LinePlot(color=[1, 0, 0, 1], line_width=2)
+        self.scorePlotMedian = LinePlot(color=[0.3, 0.3, 1, 1], line_width=2)
         self.scorePlot.points = [(0,0)]
+        self.scorePlotMedian.points = [(0,0)]
         self.graphScore.add_plot(self.scorePlot)
+        self.graphScore.add_plot(self.scorePlotMedian)
 
 ############################ FITNESS ##################################################
         self.graphFitness = Graph(
@@ -85,8 +90,11 @@ class graphicsScreen(GridLayout):
             xmin=0)
 
         self.fitnessPlot = LinePlot(color=[1, 0, 0, 1], line_width=2)
+        self.fitnessPlotMedian = LinePlot(color=[0.3, 0.3, 1, 1], line_width=2)
         self.fitnessPlot.points = [(0,0)]
+        self.fitnessPlotMedian.points = [(0,0)]
         self.graphFitness.add_plot(self.fitnessPlot)
+        self.graphFitness.add_plot(self.fitnessPlotMedian)
 
 ############################ SCORE TIME ##################################################
         self.graphScoreTime = Graph(
@@ -106,8 +114,11 @@ class graphicsScreen(GridLayout):
             xmin=0)
 
         self.scoreTimePlot = LinePlot(color=[1, 0, 0, 1], line_width=2)
+        self.scoreTimePlotMedian = LinePlot(color=[0.3, 0.3, 1, 1], line_width=2)
         self.scoreTimePlot.points = [(0,0)]
+        self.scoreTimePlotMedian.points = [(0,0)]
         self.graphScoreTime.add_plot(self.scoreTimePlot)
+        self.graphScoreTime.add_plot(self.scoreTimePlotMedian)
 
 
 ############################ GENERATION TIME ##################################################
@@ -159,8 +170,11 @@ class graphicsScreen(GridLayout):
                     seconds = list(map(float, row[1][1:-1].split(",")))
 
             self.scorePoints = []
+            self.scorePointsMedian = []
             self.fitnessPoints = []
+            self.fitnessPointsMedian = []
             self.scoreTimePoints = []
+            self.scoreTimePointsMedian = []
             self.timeGenPoints = []
             for i in range(len(score)):
                 self.scorePoints.append((generation[i], score[i]))
@@ -168,13 +182,19 @@ class graphicsScreen(GridLayout):
                 self.scoreTimePoints.append((seconds[i]/60, score[i]))
                 self.timeGenPoints.append((generation[i], seconds[i]/60))
 
+            self.scorePointsMedian = self.floatMedian(self.scorePoints)
+            self.fitnessPointsMedian = self.floatMedian(self.fitnessPoints)
+            self.scoreTimePointsMedian = self.floatMedian(self.scoreTimePoints)
             self.graphsUpdate()
 
 
     def readPipeData(self, *args):
         self.scorePoints = []
+        self.scorePointsMedian = []
         self.fitnessPoints = []
+        self.fitnessPointsMedian = []
         self.scoreTimePoints = []
+        self.scoreTimePointsMedian = []
         self.timeGenPoints = []
         if os.path.exists(self.dataFile):
             with open(self.dataFile, "r") as file:
@@ -190,6 +210,9 @@ class graphicsScreen(GridLayout):
                     self.scoreTimePoints.append((minutes, score))
                     self.timeGenPoints.append((generation, minutes))
 
+            self.scorePointsMedian = self.floatMedian(self.scorePoints)
+            self.fitnessPointsMedian = self.floatMedian(self.fitnessPoints)
+            self.scoreTimePointsMedian = self.floatMedian(self.scoreTimePoints)
             self.graphsUpdate()
         else:
             self.readHandle.cancel()
@@ -197,8 +220,14 @@ class graphicsScreen(GridLayout):
 
     def graphsUpdate(self):
         self.scorePlot.points = self.scorePoints
+        self.scorePlotMedian.points = self.scorePointsMedian
+
         self.fitnessPlot.points = self.fitnessPoints
+        self.fitnessPlotMedian.points = self.fitnessPointsMedian
+
         self.scoreTimePlot.points = self.scoreTimePoints
+        self.scoreTimePlotMedian.points = self.scoreTimePointsMedian
+
         self.genTimePlot.points = self.timeGenPoints
 
         xmax = self.scorePlot.points[-1][0]
@@ -247,6 +276,22 @@ class graphicsScreen(GridLayout):
         self.graphFitness.y_ticks_major = int(self.graphFitness.ymax/10)
         self.graphScoreTime.y_ticks_major = int(self.graphScoreTime.ymax/10)
         self.graphGenTime.y_ticks_major = float(self.graphGenTime.ymax/10)
+
+    def floatMedian(self, points):
+        retPoints = []
+        if len(points) > 4:
+            tmpPoints = [0] * len(points)
+
+            for i in range(len(points)):
+                tmpPoints[i] = points[i][1]
+
+            for i in range(4):
+                retPoints.append((points[i][0], points[i][1]))
+
+            for i in range(len(points)-9-4):
+                retPoints.append((points[i+4][0], sorted(tmpPoints[i+4:i+4+9])[4]))
+
+        return retPoints
 
 class GraphView(App):
     def build(self):

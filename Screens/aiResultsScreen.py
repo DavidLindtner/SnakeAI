@@ -271,13 +271,13 @@ class AiResultScreen(GridLayout):
 
     def popupShow(self):
         layout = GridLayout(cols = 1, padding = 10) 
-        popupLabel1 = Label(text = "NO file selected") 
-        popupLabel2 = Label(text = "IMPORT file with population of snakes") 
+        popupLabel1 = Label(text = "NO file selected", font_size='20sp') 
+        popupLabel2 = Label(text = "IMPORT file with population of snakes", font_size='20sp') 
         layout.add_widget(popupLabel1) 
         layout.add_widget(popupLabel2) 
         popup = Popup(title ='INFO', 
                         content = layout, 
-                        size_hint =(None, None), size =(300, 150))   
+                        size_hint =(None, None), size =(400, 200))   
         popup.open()            
 
 

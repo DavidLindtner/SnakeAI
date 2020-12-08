@@ -124,6 +124,11 @@ class Snake():
                 self.field[self.parts[0]] = 5
                 return False
 
+        #   lot of moves without food
+        if self.noWithoutFood > ((self.fieldSize-2)* (self.fieldSize-2) * 2):
+            self.field[self.parts[0]] = 5
+            return False
+
         self.headsecondLastMove = self.headLastMove
         self.headLastMove = self.parts[0]
         #self.countVision()
@@ -202,7 +207,8 @@ class Snake():
 
 
     def calculateFitness(self):
-        self.fitness = self.score * 100 + self.noOfMoves
+        self.fitness = self.score * (self.fieldSize-2)* (self.fieldSize-2) * 4 + self.noOfMoves
+
 
     def countVision(self):
         #   BORDER

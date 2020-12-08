@@ -10,6 +10,8 @@ from kivy.properties import ListProperty
 from kivy.lang import Builder
 import csv
 import sys
+import ctypes
+ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 from Globals import globalFcns
 
@@ -62,7 +64,7 @@ class SimulateScreen(GridLayout):
         self.fieldSize = fieldSize
         self.snakeSpeed = snakeSpeed
         self.fileName = fileName
-        self.indexWeight = indexWeight
+        self.indexWeight = indexWeight-1
 
         self.readWeightCsv(self.fileName)
 
@@ -86,7 +88,7 @@ class SimulateScreen(GridLayout):
         self.add_widget(Label())
         self.add_widget(Label())
 
-        againLine = GridLayout(cols=3, row_force_default=True, row_default_height=40)
+        againLine = GridLayout(cols=3, row_force_default=True, row_default_height=50)
         againBut = Button(text='Again', size_hint_x=None, width=200, font_size='20sp',)
         againBut.bind(on_press=self.againButton)
         againLine.add_widget(Label())

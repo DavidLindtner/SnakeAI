@@ -72,7 +72,7 @@ class AiScreen(GridLayout):
 ############################## NUMBER OF SNAKES ###########################################################################
         numSnakeLine = GridLayout(cols=2, row_force_default=True, row_default_height=40)
         numSnakeLine.add_widget(Label(text='Number of snakes\n   in 1 generation', size_hint_x=None, width=250, font_size='20sp'))
-        self.noOfSnakesTI = TextInput(multiline=False, text=str(self.noOfSnakes), size_hint_x=None, width=50, font_size='20sp')
+        self.noOfSnakesTI = TextInput(multiline=False, text=str(self.noOfSnakes), size_hint_x=None, width=70, font_size='20sp')
         numSnakeLine.add_widget(self.noOfSnakesTI)
 
         self.add_widget(numSnakeLine)
@@ -96,7 +96,7 @@ class AiScreen(GridLayout):
         netSnakeLine.add_widget(self.neuron1LayerTI)
 
         netSnakeLine.add_widget(Label(text='Neurons in\n   2. layer', size_hint_x=None, width=150, font_size='20sp'))
-        self.neuron2LayerTI = TextInput(multiline=False, text=str(self.noOfNeuron2Layer), size_hint_x=None, width=40, font_size='20sp')
+        self.neuron2LayerTI = TextInput(multiline=False, text=str(self.noOfNeuron2Layer), size_hint_x=None, width=50, font_size='20sp')
         netSnakeLine.add_widget(self.neuron2LayerTI)
 
         self.add_widget(netSnakeLine)
@@ -153,14 +153,14 @@ class AiScreen(GridLayout):
 
     def openGraphs(self, instance):
         if self.generate == 0:
-            self.popupShow(True)
+            self.popupShow(0)
         else:
             openG = threading.Thread(target=self.openGraphsThr)
             openG.start()
 
     def simulateSnake(self, instance):
         if self.generate == 0:
-            self.popupShow(False)
+            self.popupShow(1)
         else:
             openG = threading.Thread(target=self.simulateSnakeThr)
             openG.start()
@@ -180,24 +180,26 @@ class AiScreen(GridLayout):
         dataIn.put([globalVars.fieldSize, 50, self.fileName, int(self.actualSnaleLabel.text)])
 
     def generateSnakesButton(self, instance):
-        if os.path.exists(self.graphName):
-            os.remove(self.graphName)
-            
-        self.noOfNeuron1Layer = int(self.neuron1LayerTI.text)
-        self.noOfNeuron2Layer = int(self.neuron2LayerTI.text)
+        if self.generate:
+            self.popupShow(2)
+        else:
+            if os.path.exists(self.graphName):
+                os.remove(self.graphName)
+                
+            self.noOfNeuron1Layer = int(self.neuron1LayerTI.text)
+            self.noOfNeuron2Layer = int(self.neuron2LayerTI.text)
 
-        if self.createDataCsv():
-            self.stopSnakeBut.background_color = [1, 0.3, 0.3, 1]
+            if self.createDataCsv():
+                self.stopSnakeBut.background_color = [1, 0.3, 0.3, 1]
 
-            self.generateProcessHandle = threading.Thread(target=self.generateProcessThread, daemon=True)
-            self.generateProcessHandle.start()
+                self.generateProcessHandle = threading.Thread(target=self.generateProcessThread, daemon=True)
+                self.generateProcessHandle.start()
 
     def generateProcessThread(self):
         dataIn = multiprocessing.JoinableQueue()
         results = multiprocessing.Queue()
         multiprocessing.freeze_support()        
         gen = GenProcess(dataIn, results)
-        #gen.daemon = True
         gen.start()
 
         dataIn.put([self.noOfSnakes, float(self.selectionRateTI.text), float(self.mutationRateTI.text), self.noOfNeuron1Layer, self.noOfNeuron2Layer, self.fileName, self.fileDateTime, globalVars.fieldSize])
@@ -212,29 +214,6 @@ class AiScreen(GridLayout):
             self.fitnesslSnaleLabel.text = str(result[2])
 
         dataIn.put(0)
-
-    def buttonProcess(self):
-        from testProcess import Proc
-        dataIn = multiprocessing.JoinableQueue()
-        results = multiprocessing.Queue()
-        proces = Proc(dataIn, results)
-        proces.daemon = True
-        print("main - startujeme process")
-        proces.start()
-
-        for i in range(3):
-            dataIn.put(i+1)
-            result = results.get() 
-            print("main result " + str(result))
-            self.actualSnaleLabel.text = str(result[0])
-            self.scorelSnaleLabel.text = str(result[1])
-            self.fitnesslSnaleLabel.text = str(result[2])
-
-        dataIn.put(0)
-        result = results.get() 
-        self.actualSnaleLabel.text = str(result[0])
-        self.scorelSnaleLabel.text = str(result[1])
-        self.fitnesslSnaleLabel.text = str(result[2])
 
 
     def stopSnakeButton(self, instance):
@@ -263,17 +242,21 @@ class AiScreen(GridLayout):
 
     def popupShow(self, info):
         layout = GridLayout(cols = 1, padding = 10) 
-        popupLabel1 = Label(text = "Training has not started")
-        if info == True:
-            popupLabel2 = Label(text = "NO graphs for training available")
-        else:
-            popupLabel2 = Label(text = "NO simulations for training available")
+        if info == 0:
+            popupLabel1 = Label(text = "Training has not started", font_size='20sp')
+            popupLabel2 = Label(text = "NO graphs for training available", font_size='20sp')
+        elif info == 1:
+            popupLabel1 = Label(text = "Training has not started", font_size='20sp')
+            popupLabel2 = Label(text = "NO simulations for training available", font_size='20sp')
+        elif info == 2:
+            popupLabel1 = Label(text = "Training is running", font_size='20sp')
+            popupLabel2 = Label(text = "Stop the training and train again", font_size='20sp')
 
         layout.add_widget(popupLabel1) 
         layout.add_widget(popupLabel2) 
-        popup = Popup(title ='INFO', 
+        popup = Popup(title ='INFO',
                         content = layout, 
-                        size_hint =(None, None), size =(300, 150))   
+                        size_hint =(None, None), size =(400, 200))   
         popup.open()
 
     def __del__(self):

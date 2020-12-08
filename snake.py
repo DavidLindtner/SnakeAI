@@ -1,5 +1,4 @@
 #   pyinstaller snake.py --onedir --noconsole --icon Icons\snake.ico
-#   pyinstaller snake.py --onedir --icon Icons\snake.ico
 
 import multiprocessing
 if __name__ == '__main__':
@@ -23,6 +22,7 @@ from Screens.playScreen import PlayScreen
 from Screens.aiScreen import AiScreen
 from Screens.aiResultsScreen import AiResultScreen
 
+#kivy.require("2.0.0")
 kivy.require("1.11.1")
 
 globalVars.init()

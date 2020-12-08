@@ -9,7 +9,7 @@ from Intelligence.crossover import Crossover
 
 class Generation():
     def __init__(self, noOfSnakes, selectionRate, noNeuron1Layer, noNeuron2Layer, mutationRate=0):
-        self.noOfThreads = 4
+        self.noOfThreads = 10
 
         self.noOfNeuron1Layer = noNeuron1Layer
         self.noOfNeuron2Layer = noNeuron2Layer
@@ -40,7 +40,6 @@ class Generation():
             else:
                 thrHandle.append(threading.Thread(target=self.simulateSnakeThr, args=(arg1, arg2,), daemon=True))
           
-
         for thr in thrHandle:
             thr.start()
 
@@ -50,15 +49,14 @@ class Generation():
 
     def simulateSnakeThr(self, start, stop):
         for j in range(start, stop):
-            while  self.snakes[j].noWithoutFood < globalVars.fieldSize * globalVars.fieldSize * 2:
-                if not self.snakes[j].snakeStep():
+            while True:
+                if not self.snakes[j].snakeStep():  # if dead
                     self.fitness[j] = self.snakes[j].fitness
                     break
 
-
     def exportBest(self):
         selection = Selection()
-        bestSnakesIndex = selection.selectBestRank(self.fitness, self.selectionRate)
+        bestSnakesIndex = selection.selectBestRank(self.fitness.copy(), self.selectionRate)
 
         bestSnakes = []
 
