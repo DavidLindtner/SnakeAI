@@ -6,8 +6,11 @@ import time
 import sys
 import csv
 import os
-import ctypes
-ctypes.windll.shcore.SetProcessDpiAwareness(1)
+import os
+if os.name == 'nt':
+	import ctypes
+	ctypes.windll.shcore.SetProcessDpiAwareness(1)
+
 
 import kivy
 from kivy.app import App

@@ -5,8 +5,10 @@ if __name__ == '__main__':
     multiprocessing.freeze_support()
 
 import tkinter as tk
-import ctypes
-ctypes.windll.shcore.SetProcessDpiAwareness(1)
+import os
+if os.name == 'nt':
+	import ctypes
+	ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 import kivy
 from kivy.app import App

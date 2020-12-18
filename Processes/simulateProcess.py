@@ -10,8 +10,11 @@ from kivy.properties import ListProperty
 from kivy.lang import Builder
 import csv
 import sys
-import ctypes
-ctypes.windll.shcore.SetProcessDpiAwareness(1)
+
+import os
+if os.name == 'nt':
+	import ctypes
+	ctypes.windll.shcore.SetProcessDpiAwareness(1)
 
 from Globals import globalFcns
 

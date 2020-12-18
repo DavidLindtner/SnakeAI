@@ -4,6 +4,7 @@
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
+SnakeEnv
 __pycache__/
 *.py[cod]
 *$py.class
@@ -143,6 +144,7 @@ dmypy.json
 .prof
 
 ### VisualStudioCode ###
+.vscode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
