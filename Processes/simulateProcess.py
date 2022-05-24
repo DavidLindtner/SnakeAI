@@ -135,7 +135,6 @@ class SimulateScreen(GridLayout):
 
         self.event = Clock.schedule_interval(self.drawScreen, 1/self.snakeSpeed)
 
-
     def againButton(self, instance):
         self.event.cancel()
         del self.snake

@@ -207,7 +207,7 @@ class Snake():
 
 
     def calculateFitness(self):
-        self.fitness = self.score * (self.fieldSize-2)* (self.fieldSize-2) * 4 + self.noOfMoves
+        self.fitness = self.score * (self.fieldSize-2)* (self.fieldSize-2) - self.noOfMoves
 
 
     def countVision(self):

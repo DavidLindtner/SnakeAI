@@ -34,7 +34,6 @@ class SnakeAI(App):
     def build(self):
         self.icon = 'Icons/snake.png'
 
-
         self.root = tk.Tk()
         self.root.withdraw()
 

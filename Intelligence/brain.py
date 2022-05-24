@@ -1,4 +1,5 @@
 import numpy as np
+import math
 
 from Globals import globalFcns
 
@@ -25,14 +26,20 @@ class Brain():
         self.randomWeights()
 
     def randomWeights(self):
+        #strength = math.sqrt(2/self.noOfNeuron1Layer)
         strength = 0.2
-        self.weights1 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron1Layer, self.noOfInputs))
-        self.weights2 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron2Layer, self.noOfNeuron1Layer))
-        self.weights3 = np.random.normal(loc=0, scale=strength, size=(self.noOfOutputs, self.noOfNeuron2Layer))
-
         self.bias1 = np.random.normal(loc=0, scale=strength, size=(self.noOfInputs, 1))
+
+        #strength = math.sqrt(2/self.noOfNeuron2Layer)
+        self.weights1 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron1Layer, self.noOfInputs))
         self.bias2 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron1Layer, 1))
+
+        #strength = math.sqrt(2/4)
+        self.weights2 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron2Layer, self.noOfNeuron1Layer))
         self.bias3 = np.random.normal(loc=0, scale=strength, size=(self.noOfNeuron2Layer, 1))
+
+        #strength = math.sqrt(2)
+        self.weights3 = np.random.normal(loc=0, scale=strength, size=(self.noOfOutputs, self.noOfNeuron2Layer))
 
         #print(self.weights1)
         #print(self.bias1)
@@ -87,6 +94,8 @@ class Brain():
         return input*self.sigmoid(input)
 
     def relu(self, input):
-        return input * (input > 0)
-    
+        return np.maximum(input, 0)
+
+    def leakyRelu(self, input):
+        return np.maximum(0.01*input, input)
 

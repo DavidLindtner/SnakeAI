@@ -47,7 +47,6 @@ class StartScreen(GridLayout):
 
         self.add_widget(btn1Line)
 
-
         btn2Line = GridLayout(cols=5, row_force_default=True, row_default_height=50)
 
         self.aiConf = Button(text="Setup AI", size_hint_x=None, width=200, font_size='20sp')

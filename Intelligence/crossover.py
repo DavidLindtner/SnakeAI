@@ -1,6 +1,7 @@
 import numpy as np
 from snakeBody import Snake
 from Globals import globalFcns
+import random
 
 class Crossover():
     def __init__(self, inSnakes, noOfOutSnakes, mutationRate, noNeuron1Layer, noNeuron2Layer):
@@ -10,7 +11,6 @@ class Crossover():
         self.inSnakes = inSnakes
         self.noOutSnakes = noOfOutSnakes
         self.outSnakes = []
-
 
     def simpleCrossover(self):
         numOffsprigns = int(self.noOutSnakes/len(self.inSnakes))
@@ -32,6 +32,121 @@ class Crossover():
             self.outSnakes[-1].importBrain(ratesOld, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
 
         return self.outSnakes
+
+
+    def blendCrossover(self):
+        if len(self.inSnakes) % 2 == 1:
+            self.inSnakes.insert(0, self.inSnakes[0])
+
+        ratesOffspringList = []
+        inSnake = self.inSnakes.copy()
+
+        while inSnake:
+            index1 = np.random.randint(len(inSnake))
+            parent1 = inSnake[index1]
+            inSnake.pop(index1)
+            index2 = np.random.randint(len(inSnake))
+            parent2 = inSnake[index2]
+            inSnake.pop(index2)
+
+            rates1 = []
+            rates2 = []
+            rates1 = parent1.exportBrain()
+            rates2 = parent2.exportBrain()
+            ratesOffspring = [None] * len(rates1)
+
+            alpha = 0.5
+            for i in range(len(rates1)):
+                ratesOffspring[i] = random.choice([min(rates1[i],rates2[i])-alpha*abs(rates1[i]-rates2[i]),max(rates1[i],rates2[i])+alpha*abs(rates1[i]-rates2[i])])
+            ratesOffspringList.append(ratesOffspring)
+
+        numOffsprigns = int(self.noOutSnakes/len(ratesOffspringList))
+        offspringsList = [numOffsprigns] * len(ratesOffspringList)
+
+        i = 0
+        while sum(offspringsList) < self.noOutSnakes:
+            offspringsList[i] += 1
+            i += 1
+
+        i = 0
+        while sum(offspringsList) > self.noOutSnakes-len(self.inSnakes):
+            offspringsList[i] -= 1
+            i += 1
+            if i == len(offspringsList):
+                i = 0
+
+        for numOffspr in offspringsList:
+            for j in range(numOffspr):
+                ratesOld = ratesOffspringList[i].copy()
+                ratesNew = self.mutation(ratesOld)
+                self.outSnakes.append(Snake(intelligence=True))
+                self.outSnakes[-1].importBrain(ratesNew, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
+
+        for i in range(len(self.inSnakes)):
+            ratesOld = self.inSnakes[i].exportBrain()
+            self.outSnakes.append(Snake(intelligence=True))
+            self.outSnakes[-1].importBrain(ratesOld, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
+
+        return self.outSnakes
+
+
+    def convexCrossover(self):
+        if len(self.inSnakes) % 2 == 1:
+            self.inSnakes.insert(0, self.inSnakes[0])
+
+        ratesOffspringList = []
+        inSnake = self.inSnakes.copy()
+
+        while inSnake:
+            index1 = np.random.randint(len(inSnake))
+            parent1 = inSnake[index1]
+            inSnake.pop(index1)
+            index2 = np.random.randint(len(inSnake))
+            parent2 = inSnake[index2]
+            inSnake.pop(index2)
+
+            rates1 = []
+            rates2 = []
+            rates1 = parent1.exportBrain()
+            rates2 = parent2.exportBrain()
+            ratesOffspring = [None] * len(rates1)
+
+            randomNumber = random.uniform(0, 1)
+            for i in range(len(rates1)):
+                ratesOffspring[i] = randomNumber * rates1[i] + (1 - randomNumber) * rates2[i]
+            ratesOffspringList.append(ratesOffspring)
+
+        numOffsprigns = int(self.noOutSnakes/len(ratesOffspringList))
+        offspringsList = [numOffsprigns] * len(ratesOffspringList)
+
+        i = 0
+        while sum(offspringsList) < self.noOutSnakes:
+            offspringsList[i] += 1
+            i += 1
+
+        i = 0
+        while sum(offspringsList) > self.noOutSnakes-len(self.inSnakes):
+            offspringsList[i] -= 1
+            i += 1
+            if i == len(offspringsList):
+                i = 0
+
+        for numOffspr in offspringsList:
+            for j in range(numOffspr):
+                ratesOld = ratesOffspringList[i].copy()
+                ratesNew = self.mutation(ratesOld)
+                self.outSnakes.append(Snake(intelligence=True))
+                self.outSnakes[-1].importBrain(ratesNew, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
+
+        for i in range(len(self.inSnakes)):
+            ratesOld = self.inSnakes[i].exportBrain()
+            self.outSnakes.append(Snake(intelligence=True))
+            self.outSnakes[-1].importBrain(ratesOld, noOfNeuron1=self.noOfNeuron1Layer, noOfNeuron2=self.noOfNeuron2Layer)
+
+        return self.outSnakes
+
+
+
 
 
 
