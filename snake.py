@@ -1,4 +1,5 @@
-#   pyinstaller snake.py --onedir --noconsole --icon Icons\snake.ico
+#    conda activate TL
+#    pyinstaller snake.py --onedir --noconsole --icon Icons\snake.ico
 
 import multiprocessing
 if __name__ == '__main__':
