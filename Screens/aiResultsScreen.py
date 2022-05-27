@@ -139,17 +139,17 @@ class AiResultScreen(GridLayout):
 
         sliderLine.add_widget(Label(text="Generations", font_size='20sp'))
 
-        self.slider = Slider(min=0, max=0, value=25, orientation='horizontal', size_hint=(0.8, 1))
+        self.slider = Slider(min=1, max=1, value=25, orientation='horizontal', size_hint=(0.8, 1))
         self.slider.fbind('value', self.onChangeSliderValue)
         
         sliderUpLine = BoxLayout()
-        sliderUpLine.add_widget(Label(text='0', size_hint=(0.1, 1), font_size='20sp'))
+        sliderUpLine.add_widget(Label(text='1', size_hint=(0.1, 1), font_size='20sp'))
         sliderUpLine.add_widget(self.slider)
-        self.noOfWeightsLabel = Label(text='0', size_hint=(0.1, 1), font_size='20sp')
+        self.noOfWeightsLabel = Label(text='1', size_hint=(0.1, 1), font_size='20sp')
         sliderUpLine.add_widget(self.noOfWeightsLabel)
         sliderLine.add_widget(sliderUpLine)
 
-        self.actSliderValLabel = Label(text='0', font_size='20sp')
+        self.actSliderValLabel = Label(text='1', font_size='20sp')
         sliderLine.add_widget(self.actSliderValLabel)
         self.add_widget(sliderLine)
 
