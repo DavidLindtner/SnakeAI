@@ -69,10 +69,13 @@ class graphicsScreen(GridLayout):
             xmin=0)
 
         self.scorePlot = LinePlot(color=[1, 0, 0, 1], line_width=2)
+        self.avgScorePlot = LinePlot(color=[0.98, 0.86, 0.1, 1], line_width=2)
         self.scorePlotMedian = LinePlot(color=[0.3, 0.3, 1, 1], line_width=2)
         self.scorePlot.points = [(0,0)]
+        self.avgScorePlot.points = [(0,0)]
         self.scorePlotMedian.points = [(0,0)]
         self.graphScore.add_plot(self.scorePlot)
+        self.graphScore.add_plot(self.avgScorePlot)
         self.graphScore.add_plot(self.scorePlotMedian)
 
 ############################ FITNESS ##################################################
@@ -159,28 +162,35 @@ class graphicsScreen(GridLayout):
         with open(self.dataFile) as csv_file:
             csv_reader = csv.reader(csv_file, delimiter=',')
             score = []
+            avgScore = []
             generation = []
             fitness = []
             seconds = []
             for row in csv_reader:
                 if row[0] == 'score':
                     score = list(map(int, row[1][1:-1].split(",")))
+                if row[0] == 'medScore':
+                    avgScore = list(map(float, row[1][1:-1].split(",")))
                 elif row[0] == 'generation':
                     generation = list(map(int, row[1][1:-1].split(",")))
                 elif row[0] == 'fitness':
                     fitness = list(map(int, row[1][1:-1].split(",")))
                 elif row[0] == 'seconds':
                     seconds = list(map(float, row[1][1:-1].split(",")))
+                    
 
             self.scorePoints = []
             self.scorePointsMedian = []
+            self.avgScorePoints = []
             self.fitnessPoints = []
             self.fitnessPointsMedian = []
             self.scoreTimePoints = []
             self.scoreTimePointsMedian = []
             self.timeGenPoints = []
+
             for i in range(len(score)):
                 self.scorePoints.append((generation[i], score[i]))
+                self.avgScorePoints.append((generation[i], avgScore[i]))
                 self.fitnessPoints.append((generation[i], fitness[i]))
                 self.scoreTimePoints.append((seconds[i]/60, score[i]))
                 self.timeGenPoints.append((generation[i], seconds[i]/60))
@@ -193,6 +203,7 @@ class graphicsScreen(GridLayout):
 
     def readPipeData(self, *args):
         self.scorePoints = []
+        self.avgScorePoints = []
         self.scorePointsMedian = []
         self.fitnessPoints = []
         self.fitnessPointsMedian = []
@@ -207,8 +218,10 @@ class graphicsScreen(GridLayout):
                     generation = int(data[1])
                     fitness = int(data[2])
                     minutes = float(data[3])/60
+                    avgScore = float(data[4])
 
                     self.scorePoints.append((generation, score))
+                    self.avgScorePoints.append((generation, avgScore))
                     self.fitnessPoints.append((generation, fitness))
                     self.scoreTimePoints.append((minutes, score))
                     self.timeGenPoints.append((generation, minutes))
@@ -223,6 +236,7 @@ class graphicsScreen(GridLayout):
 
     def graphsUpdate(self):
         self.scorePlot.points = self.scorePoints
+        self.avgScorePlot.points = self.avgScorePoints
         self.scorePlotMedian.points = self.scorePointsMedian
 
         self.fitnessPlot.points = self.fitnessPoints

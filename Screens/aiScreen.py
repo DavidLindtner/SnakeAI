@@ -52,8 +52,8 @@ class AiScreen(GridLayout):
         self.generate = False
         self.noOfSnakes = 200
         self.noOfGenerations = 0
-        self.noOfNeuron1Layer = 12
-        self.noOfNeuron2Layer = 8
+        self.noOfNeuron1Layer = 30
+        self.noOfNeuron2Layer = 15
         self.snakes = []
         self.bestSnakes = []
         self.fitness = []
@@ -188,6 +188,7 @@ class AiScreen(GridLayout):
                 
             self.noOfNeuron1Layer = int(self.neuron1LayerTI.text)
             self.noOfNeuron2Layer = int(self.neuron2LayerTI.text)
+            self.noOfSnakes = int(self.noOfSnakesTI.text)
 
             if self.createDataCsv():
                 self.stopSnakeBut.background_color = [1, 0.3, 0.3, 1]
@@ -201,7 +202,8 @@ class AiScreen(GridLayout):
         multiprocessing.freeze_support()        
         gen = GenProcess(dataIn, results)
         gen.start()
-
+        
+        
         dataIn.put([self.noOfSnakes, float(self.selectionRateTI.text), float(self.mutationRateTI.text), self.noOfNeuron1Layer, self.noOfNeuron2Layer, self.fileName, self.fileDateTime, globalVars.fieldSize])
         result = results.get()
 

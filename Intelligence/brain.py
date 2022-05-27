@@ -11,7 +11,7 @@ from Globals import globalFcns
 
 class Brain():
     def __init__(self, noOfNeuron1=18, noOfNeuron2=12):
-        self.noOfInputs = 24
+        self.noOfInputs = 25
         self.noOfNeuron1Layer = noOfNeuron1
         self.noOfNeuron2Layer = noOfNeuron2
         self.noOfOutputs = 4
@@ -60,6 +60,8 @@ class Brain():
 
     def think(self, input):
         self.inputs = np.array(input)[np.newaxis]
+        #self.inputs = np.concatenate((self.inputs, np.array(self.outputList)[np.newaxis]), axis=1)
+
         outBias1 = np.add(self.inputs.T, self.bias1)
 
         outL1 = self.relu(outBias1)

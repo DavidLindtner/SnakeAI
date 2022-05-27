@@ -3,6 +3,8 @@ import threading
 from Globals import globalVars
 from snakeBody import Snake
 
+import statistics
+
 from Intelligence.selection import Selection
 from Intelligence.crossover import Crossover
 
@@ -63,7 +65,11 @@ class Generation():
         for bSnake in bestSnakesIndex:
             bestSnakes.append(self.snakes[bSnake])
 
-        return bestSnakes
+        score = []
+        for snake in bestSnakes:
+            score.append(snake.score)
+
+        return [bestSnakes, statistics.median(score)]
 
     def bestWeights(self):
         bestSnakeIndex = self.fitness.index(max(self.fitness))
@@ -71,6 +77,7 @@ class Generation():
 
     def bestScoreFitness(self):
         bestSnakeIndex = self.fitness.index(max(self.fitness))
+
         return [self.snakes[bestSnakeIndex].score, self.fitness[bestSnakeIndex]]
 
     def __del__(self):

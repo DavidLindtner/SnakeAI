@@ -353,7 +353,7 @@ class Snake():
         elif self.moveX == 0 and self.moveY == -1:
             self.lastMove[3] = 1
 
-        self.see = self.distWall + self.distSnake + self.seeFood
+        self.see = self.distWall + self.distSnake + self.seeFood + [self.score / ((self.fieldSize-2) * (self.fieldSize-2))] # + self.brain.outputList
 
         #print(" ")
         #print("distWall : " + str(self.distWall))

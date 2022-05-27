@@ -54,13 +54,13 @@ class GenProcess(multiprocessing.Process):
                                         noNeuron2Layer=self.noOfNeuron2Layer)
                 startTime = time.time()
                 generation.live()
-                bestSnakes = generation.exportBest()
+                bestSnakes, medScore = generation.exportBest()
                 score, fitness = generation.bestScoreFitness()
                 noOfInputs, noOfNeuron1Layer, noOfNeuron2Layer = bestSnakes[0].exportDimBrain()
                 self.saveDataCsv(noOfInputs=noOfInputs, noOfNeuron1Layer=noOfNeuron1Layer, noOfNeuron2Layer=noOfNeuron2Layer)
                 self.saveWeightsCsv(generation.bestWeights())
                 actualTime = time.time() - startTime
-                self.writeDataGraphs(score, counterGen, fitness, actualTime)
+                self.writeDataGraphs(score, counterGen, fitness, actualTime, medScore)
                 self.openGraphs(0)
                 del generation
             else:
@@ -70,11 +70,11 @@ class GenProcess(multiprocessing.Process):
                                         noNeuron2Layer=self.noOfNeuron2Layer,
                                         mutationRate=self.mutationRate)
                 generation.live(parents=bestSnakes)
-                bestSnakes = generation.exportBest()
+                bestSnakes, medScore = generation.exportBest()
                 score, fitness = generation.bestScoreFitness()
                 self.saveWeightsCsv(generation.bestWeights())
                 actualTime = time.time() - startTime
-                self.writeDataGraphs(score, counterGen, fitness, actualTime)
+                self.writeDataGraphs(score, counterGen, fitness, actualTime, medScore)
                 del generation
 
             self.bestScore.append(score)
@@ -108,9 +108,9 @@ class GenProcess(multiprocessing.Process):
             writer.writerow(["weights", weights])
 
 
-    def writeDataGraphs(self, score, gen, fit, sec):
+    def writeDataGraphs(self, score, gen, fit, sec, avgScore):
         with open(self.graphName, 'a') as f:
-            f.write(str(score) + ',' + str(gen) + ',' + str(fit) + ',' + str(sec) + ",\n")
+            f.write(str(score) + ',' + str(gen) + ',' + str(fit) + ',' + str(sec) + ',' + str(avgScore) + ",\n")
 
 
     def saveBestScoreCsv(self):
@@ -119,21 +119,26 @@ class GenProcess(multiprocessing.Process):
             self.generation = []
             self.fitness = []
             self.seconds = []
+            self.avgScore = []
+
             for line in file:
                 data = list(line.split(","))
                 score = int(data[0])
                 generation = int(data[1])
                 fitness = int(data[2])
                 seconds = float(data[3])
+                avgScore = float(data[4])
 
                 self.score.append(score)
                 self.generation.append(generation)
                 self.fitness.append(fitness)
                 self.seconds.append(seconds)
+                self.avgScore.append(avgScore)
 
         with open(self.fileName, 'a', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["score", self.score])
+            writer.writerow(["medScore", self.avgScore])
             writer.writerow(["generation", self.generation])
             writer.writerow(["fitness", self.fitness])
             writer.writerow(["seconds", self.seconds])
